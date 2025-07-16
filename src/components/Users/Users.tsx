@@ -28,10 +28,10 @@ const Users: React.FC = () => {
     {
       id: 1,
       name: "Parth Chauhan",
-      email: "partchauhan@gmail.com",
+      email: "partchauhan10@gmail.com",
       role: "admin",
       phone: "+91 9313759966",
-      status: "active",
+      status: "inactive",
       avatar:
         "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150",
       joinDate: "2025-01-01",
@@ -40,10 +40,10 @@ const Users: React.FC = () => {
     {
       id: 2,
       name: "Nency Chauhan",
-      email: "Nency.Chauhan@gmail.com",
+      email: "NencyChauhan19@gmail.com",
       role: "admin",
       phone: "+91 9396795573",
-      status: "active",
+      status: "inactive",
       avatar:
         "https://images.pexels.com/photos/3763188/pexels-photo-3763188.jpeg?auto=compress&cs=tinysrgb&w=150",
       joinDate: "2025-01-10",
@@ -55,7 +55,7 @@ const Users: React.FC = () => {
       email: "mike.davis@email.com",
       role: "agent",
       phone: "+91 (555) 345-6789",
-      status: "inactive",
+      status: "active",
       avatar:
         "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150",
       joinDate: "2025-07-05",
@@ -200,7 +200,7 @@ const Users: React.FC = () => {
                   <button
                     onClick={() => toggleUserStatus(user.id)}
                     className={`w-3 h-3 rounded-full ${
-                      user.status === "active" ? "bg-green-500" : "bg-gray-400"
+                      user.status === "active" ? "bg-green-600" : "bg-red-500"
                     }`}
                     title={`Status: ${user.status}`}
                   />
