@@ -41,9 +41,8 @@ const PropertyChart: React.FC = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10">
-        {/* Bar Chart Section */}
-        <div className="flex-1 w-full">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-10 ">
+        <div className="flex-1 w-full border-r-gray-300 border-r-2">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Property Sales & Rentals (Monthly)
           </h2>
@@ -68,7 +67,6 @@ const PropertyChart: React.FC = () => {
           </div>
         </div>
 
-        {/* Pie Chart Section */}
         <div className="flex-1 w-full">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
             Property Type Distribution

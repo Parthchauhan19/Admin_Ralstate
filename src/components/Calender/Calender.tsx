@@ -1,14 +1,10 @@
 import React, { useState } from "react";
 import {
-  Calendar,
   Clock,
   Plus,
-  Edit,
   Trash2,
   User,
   MapPin,
-  Phone,
-  Home,
   ChevronLeft,
   ChevronRight,
   X,
@@ -59,37 +55,42 @@ const agents: Agent[] = [
   },
   {
     id: "3",
-    name: "Mike Wilson",
+    name: "Chirag Mehta",
     color: "bg-purple-500",
-    phone: "+1 (555) 345-6789",
+    phone: "+91 98765 43210",
   },
   {
     id: "4",
-    name: "Manish Malhotra",
+    name: "Nirali Shah",
     color: "bg-orange-500",
-    phone: "+91 9678453656",
+    phone: "+91 96874 53656",
   },
 ];
 
 const properties: Property[] = [
   {
     id: "1",
-    address: "123 Main St, Downtown",
+    address: "12 Shivalik Residency, Science City Road, Ahmedabad",
     type: "Apartment",
-    price: "$450,000",
+    price: "₹45,00,000",
   },
   {
     id: "2",
-    address: "456 Oak Ave, Suburbs",
+    address: "108 Green Meadows, Gotri Road, Vadodara",
     type: "House",
-    price: "$750,000",
+    price: "₹75,00,000",
   },
-  { id: "3", address: "789 Pine Rd, Uptown", type: "Condo", price: "$320,000" },
+  {
+    id: "3",
+    address: "9 Sun Residency, Pal Road, Surat",
+    type: "Condo",
+    price: "₹32,00,000",
+  },
   {
     id: "4",
-    address: "321 Elm St, Midtown",
+    address: "32 Sardar Park, Kalawad Road, Rajkot",
     type: "Townhouse",
-    price: "$580,000",
+    price: "₹58,00,000",
   },
 ];
 
@@ -102,10 +103,10 @@ const initialAppointments: Appointment[] = [
     duration: 60,
     agentId: "1",
     propertyId: "1",
-    clientName: "Alice Cooper",
-    clientPhone: "+1 (555) 111-2222",
+    clientName: "Alpesh Patel",
+    clientPhone: "+91 98765 43210",
     status: "scheduled",
-    notes: "First-time buyer, interested in downtown area",
+    notes: "First-time buyer, interested in 2BHK near Science City, Ahmedabad",
   },
   {
     id: "2",
@@ -115,10 +116,10 @@ const initialAppointments: Appointment[] = [
     duration: 90,
     agentId: "2",
     propertyId: "2",
-    clientName: "Bob Johnson",
-    clientPhone: "+1 (555) 333-4444",
+    clientName: "Pravin Desai",
+    clientPhone: "+91 98250 12345",
     status: "confirmed",
-    notes: "Family with 2 kids, looking for good schools nearby",
+    notes: "Looking for a 3BHK bungalow in Anand with nearby schools",
   },
   {
     id: "3",
@@ -128,10 +129,10 @@ const initialAppointments: Appointment[] = [
     duration: 45,
     agentId: "3",
     propertyId: "3",
-    clientName: "Carol Davis",
-    clientPhone: "+1 (555) 555-6666",
+    clientName: "Kiranben Shah",
+    clientPhone: "+91 90990 11223",
     status: "scheduled",
-    notes: "Investment property, cash buyer",
+    notes: "Investor from Surat, interested in rental flats near Pal area",
   },
 ];
 
@@ -200,8 +201,12 @@ function Calender() {
     return days;
   };
 
+  const formatLocalDate = (date: Date) => {
+    return date.toLocaleDateString("en-CA"); // देता है: YYYY-MM-DD
+  };
+
   const getAppointmentsForDate = (date: Date) => {
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = formatLocalDate(date);
     return appointments.filter((appointment) => appointment.date === dateStr);
   };
 
@@ -260,7 +265,9 @@ function Calender() {
       const newAppointment: Appointment = {
         id: Date.now().toString(),
         title: appointmentData.title || "Property Viewing",
-        date: appointmentData.date || "",
+        date: appointmentData.date
+          ? formatLocalDate(new Date(appointmentData.date))
+          : formatLocalDate(new Date()),
         time: appointmentData.time || "",
         duration: appointmentData.duration || 60,
         agentId: appointmentData.agentId || "1",
@@ -417,7 +424,7 @@ function Calender() {
                   return (
                     <div
                       key={appointment.id}
-                      className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-md transition-shadow"
+                      className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer hover:shadow-lg transition-shadow"
                       onClick={() => openModal(appointment)}
                     >
                       <div className="flex items-center justify-between mb-2">
@@ -467,7 +474,6 @@ function Calender() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        {/* Header */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
@@ -488,7 +494,6 @@ function Calender() {
           </div>
         </div>
 
-        {/* Calendar Navigation */}
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <div className="p-4 sm:p-6 border-b border-gray-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
@@ -543,7 +548,6 @@ function Calender() {
           </div>
         </div>
 
-        {/* Agent Legend */}
         <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Agents</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -562,7 +566,6 @@ function Calender() {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <AppointmentModal
           appointment={selectedAppointment}

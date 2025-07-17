@@ -1,13 +1,17 @@
-import React from 'react';
-import { DivideIcon as LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import React from "react";
+import {
+  DivideIcon as LucideIcon,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 
 interface StatsCardProps {
   title: string;
   value: string;
   change: string;
-  changeType: 'positive' | 'negative';
+  changeType: "positive" | "negative";
   icon: LucideIcon;
-  color: 'blue' | 'green' | 'yellow' | 'red';
+  color: "blue" | "green" | "yellow" | "red";
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({
@@ -16,25 +20,27 @@ const StatsCard: React.FC<StatsCardProps> = ({
   change,
   changeType,
   icon: Icon,
-  color
+  color,
 }) => {
   const colorClasses = {
-    blue: 'bg-blue-100 text-blue-600',
-    green: 'bg-green-100 text-green-600',
-    yellow: 'bg-yellow-100 text-yellow-600',
-    red: 'bg-red-100 text-red-600'
+    blue: "bg-blue-100 text-blue-600",
+    green: "bg-green-100 text-green-600",
+    yellow: "bg-yellow-100 text-yellow-600",
+    red: "bg-red-100 text-red-600",
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-lg transition-shadow">
       <div className="flex items-center justify-between mb-4">
         <div className={`p-3 rounded-lg ${colorClasses[color]}`}>
           <Icon className="w-6 h-6" />
         </div>
-        <div className={`flex items-center gap-1 text-sm ${
-          changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-        }`}>
-          {changeType === 'positive' ? (
+        <div
+          className={`flex items-center gap-1 text-sm ${
+            changeType === "positive" ? "text-green-600" : "text-red-600"
+          }`}
+        >
+          {changeType === "positive" ? (
             <TrendingUp className="w-4 h-4" />
           ) : (
             <TrendingDown className="w-4 h-4" />

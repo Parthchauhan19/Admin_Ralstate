@@ -51,10 +51,10 @@ const Users: React.FC = () => {
     },
     {
       id: 3,
-      name: "Mike Davis",
-      email: "mike.davis@email.com",
+      name: "Chintan Joshi",
+      email: "chintan.joshi@email.com",
       role: "agent",
-      phone: "+91 (555) 345-6789",
+      phone: "+91 98765 43210",
       status: "active",
       avatar:
         "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150",
@@ -63,10 +63,10 @@ const Users: React.FC = () => {
     },
     {
       id: 4,
-      name: "Manish patel",
-      email: "maishpatel12@email.com",
+      name: "Manish Patel",
+      email: "manish.patel@email.com",
       role: "client",
-      phone: "+91 6356891256",
+      phone: "+91 63568 91256",
       status: "inactive",
       avatar:
         "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150",
@@ -194,7 +194,7 @@ const Users: React.FC = () => {
           return (
             <div
               key={user.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">

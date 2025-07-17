@@ -81,7 +81,6 @@ const Settings: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Tabs */}
         <div className="lg:col-span-1">
           <nav className="space-y-2">
             {tabs.map((tab) => (
@@ -101,7 +100,6 @@ const Settings: React.FC = () => {
           </nav>
         </div>
 
-        {/* Content */}
         <div className="lg:col-span-3 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           {activeTab === "general" && (
             <div className="space-y-6">

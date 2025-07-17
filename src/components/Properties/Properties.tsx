@@ -156,7 +156,6 @@ const Properties: React.FC = () => {
         </button>
       </div>
 
-      {/* Search and Filter */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
           <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
@@ -183,12 +182,11 @@ const Properties: React.FC = () => {
         </div>
       </div>
 
-      {/* Properties Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProperties.map((property) => (
           <div
             key={property.id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
           >
             <div className="relative">
               <img
@@ -266,7 +264,6 @@ const Properties: React.FC = () => {
         ))}
       </div>
 
-      {/* Property Form Modal */}
       {showForm && (
         <PropertyForm
           property={editingProperty}

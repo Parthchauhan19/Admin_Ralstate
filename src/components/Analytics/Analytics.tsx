@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   BarChart,
   Bar,
@@ -22,7 +22,53 @@ const Analytics: React.FC = () => {
     { employe: "Mayaben", Newvisites: 58, revisites: 42, Property: 17 },
     { employe: "Jinalben", Newvisites: 72, revisites: 38, Property: 13 },
     { employe: "Jigneshbhai", Newvisites: 35, revisites: 42, Property: 25 },
+    { employe: "Sureshbhai", Newvisites: 47, revisites: 29, Property: 18 },
+    { employe: "Kamleshbhai", Newvisites: 60, revisites: 33, Property: 20 },
+    { employe: "Hastiben", Newvisites: 55, revisites: 40, Property: 12 },
+    { employe: "Rajbhai", Newvisites: 42, revisites: 25, Property: 14 },
+    { employe: "Niyatiben", Newvisites: 66, revisites: 36, Property: 22 },
   ];
+
+  const [zoomRange, setZoomRange] = useState<[number, number]>([
+    0,
+    barData.length,
+  ]);
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = chartContainerRef.current;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (container && container.contains(e.target as Node)) {
+        e.preventDefault();
+
+        const delta = Math.sign(e.deltaY); // -1 for scroll up, +1 for scroll down
+        const minZoom = 3;
+        const maxZoom = barData.length;
+
+        let [start, end] = zoomRange;
+        const currentLength = end - start;
+
+        if (delta > 0 && currentLength > minZoom) {
+          // Zoom in
+          setZoomRange([start + 1, end - 1]);
+        } else if (delta < 0 && currentLength < maxZoom) {
+          // Zoom out
+          const newStart = Math.max(0, start - 1);
+          const newEnd = Math.min(barData.length, end + 1);
+          setZoomRange([newStart, newEnd]);
+        }
+      }
+    };
+
+    container?.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      container?.removeEventListener("wheel", handleWheel);
+    };
+  }, [zoomRange]);
+
+  const visibleBarData = barData.slice(zoomRange[0], zoomRange[1]);
 
   const pieDataPerEmployee = {
     Arjunbhai: [
@@ -67,6 +113,36 @@ const Analytics: React.FC = () => {
       { type: "Rental", value: 15 },
       { type: "Commercial", value: 10 },
     ],
+    Sureshbhai: [
+      { type: "Home", value: 47 },
+      { type: "Tenaments", value: 29 },
+      { type: "Rental", value: 18 },
+      { type: "Commercial", value: 3 },
+    ],
+    Kamleshbhai: [
+      { type: "Home", value: 60 },
+      { type: "Tenaments", value: 33 },
+      { type: "Rental", value: 20 },
+      { type: "Commercial", value: 10 },
+    ],
+    Hastiben: [
+      { type: "Home", value: 55 },
+      { type: "Tenaments", value: 40 },
+      { type: "Rental", value: 12 },
+      { type: "Commercial", value: 7 },
+    ],
+    Rajbhai: [
+      { type: "Home", value: 42 },
+      { type: "Tenaments", value: 25 },
+      { type: "Rental", value: 14 },
+      { type: "Commercial", value: 6 },
+    ],
+    Niyatiben: [
+      { type: "Home", value: 66 },
+      { type: "Tenaments", value: 36 },
+      { type: "Rental", value: 22 },
+      { type: "Commercial", value: 4 },
+    ],
   };
 
   const COLORS = ["#8E44AD", "#2980B9", "#27AE60", "#F39C12"];
@@ -76,15 +152,20 @@ const Analytics: React.FC = () => {
       <h2 className="text-2xl font-semibold text-gray-900 mb-4 capitalize">
         Employees Efforts To (Visites, Find-Property) (Monthly)
       </h2>
-      <div style={{ width: "100%", height: 420 }}>
+
+      {/* Bar Chart with Scroll Zoom */}
+      <div
+        ref={chartContainerRef}
+        style={{ width: "100%", height: 420, overflow: "hidden" }}
+      >
         <ResponsiveContainer>
           <BarChart
-            data={barData}
+            data={visibleBarData}
             margin={{ top: 20, right: 30, left: 10, bottom: 5 }}
           >
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="employe" tick={{ fill: "#6B7280", fontSize: 15 }} />
-            <YAxis tick={{ fill: "#6B7280", fontSize: 15 }} />
+            <XAxis dataKey="employe" tick={{ fill: "#1F2937", fontSize: 15 }} />
+            <YAxis tick={{ fill: "#1F2937", fontSize: 15 }} />
             <Tooltip />
             <Legend />
             <Bar dataKey="Newvisites" fill="#4394E5" radius={[4, 4, 0, 0]} />
@@ -94,7 +175,6 @@ const Analytics: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Pie Chart Section (1 per employee) */}
       <h2 className="text-2xl font-semibold text-gray-900 mt-20 mb-8 capitalize">
         Individual Property Type Distribution (Per Employee)
       </h2>
@@ -102,9 +182,9 @@ const Analytics: React.FC = () => {
         {Object.entries(pieDataPerEmployee).map(([employee, pieData]) => (
           <div
             key={employee}
-            className="bg-gray-50 rounded-md p-4 shadow-sm border"
+            className="bg-gray-50 rounded-md p-4 shadow-sm border hover:shadow-lg"
           >
-            <h4 className="text-sm font-medium text-center mb-2 text-gray-700">
+            <h4 className="text-md font-medium text-center mb-2 text-gray-700">
               {employee}
             </h4>
             <div style={{ width: "100%", height: 250 }}>

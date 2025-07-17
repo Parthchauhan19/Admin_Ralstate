@@ -16,7 +16,7 @@ const Dashboard: React.FC = () => {
     },
     {
       title: "Active Users",
-      value: "856",
+      value: "556",
       change: "+8%",
       changeType: "positive" as const,
       icon: Users,
@@ -24,15 +24,15 @@ const Dashboard: React.FC = () => {
     },
     {
       title: "Revenue",
-      value: "$2.4M",
-      change: "+18%",
+      value: "$2,40,00,000",
+      change: "+38%",
       changeType: "positive" as const,
       icon: DollarSign,
       color: "yellow",
     },
     {
-      title: "Views",
-      value: "45.2K",
+      title: "Visites",
+      value: "1,791",
       change: "-3%",
       changeType: "negative" as const,
       icon: Eye,
@@ -115,7 +115,6 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
-      {/* Charts and Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           <PropertyChart />
@@ -125,7 +124,6 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Recent Properties */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">
@@ -140,7 +138,7 @@ const Dashboard: React.FC = () => {
           {recentProperties.map((property) => (
             <div
               key={property.id}
-              className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+              className="bg-gray-50 rounded-lg p-4 hover:shadow-lg transition-shadow"
             >
               <img
                 src={property.image}
