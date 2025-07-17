@@ -456,7 +456,7 @@ const Settings: React.FC = () => {
                 </p>
               </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 space-x-4">
                 <button className="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                   Backup Database
                 </button>

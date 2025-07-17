@@ -1,14 +1,5 @@
 import React from "react";
-import {
-  Building,
-  Users,
-  DollarSign,
-  TrendingUp,
-  Eye,
-  Calendar,
-  MapPin,
-  Phone,
-} from "lucide-react";
+import { Building, Users, DollarSign, Eye, MapPin } from "lucide-react";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import PropertyChart from "./PropertyChart";
@@ -54,31 +45,57 @@ const Dashboard: React.FC = () => {
       id: 1,
       title: "Modern Villa in Downtown",
       price: "$850,000",
-      location: "New York, NY",
+      location: "Surat, Gujarat",
+      bedrooms: 4,
+      bathrooms: 3,
+      area: "2,500 sq ft",
+      status: "For Sale",
       image:
         "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=300",
-      status: "For Sale",
-      agent: "John Smith",
+      agent: "Parth Chauhan",
+      type: "Villa",
     },
     {
       id: 2,
       title: "Luxury Apartment",
       price: "$1,200,000",
-      location: "Los Angeles, CA",
+      location: "Rajkot, Gujarat",
+      bedrooms: 3,
+      bathrooms: 2,
+      area: "1,800 sq ft",
+      status: "Sold",
       image:
         "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=300",
-      status: "Sold",
       agent: "Sarah Johnson",
+      type: "Apartment",
     },
     {
       id: 3,
       title: "Cozy Family Home",
       price: "$650,000",
-      location: "Chicago, IL",
+      location: "Ahemdabad, Gujarat",
+      bedrooms: 5,
+      bathrooms: 4,
+      area: "3,200 sq ft",
+      status: "For Rent",
       image:
         "https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=300",
-      status: "For Rent",
       agent: "Mike Davis",
+      type: "House",
+    },
+    {
+      id: 4,
+      title: "Thakkar Family Home",
+      price: "$450,000",
+      location: "Jesalmer, Rajsathan",
+      bedrooms: 2,
+      bathrooms: 3,
+      area: "2,200 sq ft",
+      status: "For Rent",
+      image:
+        "https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=300",
+      agent: "Vinita Thakkar",
+      type: "House",
     },
   ];
 

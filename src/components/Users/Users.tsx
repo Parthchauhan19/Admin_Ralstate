@@ -61,6 +61,18 @@ const Users: React.FC = () => {
       joinDate: "2025-07-05",
       lastLogin: "2025-07-13",
     },
+    {
+      id: 4,
+      name: "Manish patel",
+      email: "maishpatel12@email.com",
+      role: "client",
+      phone: "+91 6356891256",
+      status: "inactive",
+      avatar:
+        "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=150",
+      joinDate: "2025-07-05",
+      lastLogin: "2025-07-13",
+    },
   ]);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -241,7 +253,7 @@ const Users: React.FC = () => {
                   onClick={() => toggleUserStatus(user.id)}
                   className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                     user.status === "active"
-                      ? "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+                      ? "bg-red-100 text-red-800 hover:bg-red-200"
                       : "bg-green-100 text-green-800 hover:bg-green-200"
                   }`}
                 >
