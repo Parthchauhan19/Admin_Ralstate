@@ -16,11 +16,12 @@ const Login: React.FC = () => {
     const success = await login(email, password);
     if (!success) {
       setError("Invalid credentials. Use ochireality@Admin.com / admin123");
+      setError("Invalid credentials. Use ochireality@Admin2.com / admin123");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-300 to-indigo-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
@@ -84,7 +85,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-red-600 text-white py-3 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-red-600 text-white py-3 text-xl rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {isLoading ? (
               <>
@@ -99,7 +100,9 @@ const Login: React.FC = () => {
 
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
-            Demo credentials: ochireality@Admin.com / admin123
+            Demo Id : ochireality@Admin.com / ochireality@Admin2.com
+            <br />
+            Demo Pass : admin123 / admin456
           </p>
         </div>
       </div>

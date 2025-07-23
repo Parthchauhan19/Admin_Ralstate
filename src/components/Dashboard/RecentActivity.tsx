@@ -61,7 +61,7 @@ const RecentActivity: React.FC = () => {
   return (
     <div className="bg-white rounded-lg w-full shadow-sm border border-gray-200 p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-6">
-        Recent Activity
+        Reminder Activity
       </h2>
 
       <div className="space-y-4">

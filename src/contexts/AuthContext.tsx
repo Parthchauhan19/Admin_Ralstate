@@ -63,6 +63,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       return true;
     }
 
+    if (email === "ochireality@Admin2.com" && password === "admin456") {
+      const userData: User = {
+        id: "2",
+        name: "Nency Bhuva",
+        email: "ochireality@Admin2.com",
+        role: "admin",
+        avatar:
+          "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150",
+      };
+
+      setUser(userData);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setIsLoading(false);
+      return true;
+    }
+
     setIsLoading(false);
     return false;
   };
