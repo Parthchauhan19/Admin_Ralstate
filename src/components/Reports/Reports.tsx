@@ -22,9 +22,9 @@ const Reports = () => {
     totalSales: 156,
     totalRevenue: 4500650,
     commission: 40565,
-    pendingPayments: 23,
+    pendingPayments: 53,
     completedPayments: 133,
-    failedPayments: 8,
+    failedPayments: 38,
   };
 
   const recentTransactions = [
@@ -87,6 +87,30 @@ const Reports = () => {
       paymentMethod: "Debit Card",
       date: "2025-07-11",
       buyer: "Falguni Desai",
+    },
+    {
+      id: "TXN-006",
+      propertyId: "PR-2025-006",
+      propertyTitle: "Luxures Villa In ScienceCity Road, Ahemdabad",
+      type: "Rent",
+      amount: 180000,
+      commission: 18000,
+      status: "Pending",
+      paymentMethod: "Cash",
+      date: "2025-07-13",
+      buyer: "Jeet Pandya",
+    },
+    {
+      id: "TXN-007",
+      propertyId: "PR-2025-007",
+      propertyTitle: "Corner Plot In Shindhubhavan, Ahemdabad",
+      type: "Buy",
+      amount: 180000000,
+      commission: 1800000,
+      status: "Failed",
+      paymentMethod: "Loan",
+      date: "2025-07-23",
+      buyer: "Harsh Makvana",
     },
   ];
 
@@ -295,7 +319,7 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-500 h-2 rounded-full"
-                    style={{ width: "85%" }}
+                    style={{ width: "79%" }}
                   ></div>
                 </div>
               </div>
@@ -312,7 +336,7 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: "15%" }}
+                    style={{ width: "43%" }}
                   ></div>
                 </div>
               </div>
@@ -329,7 +353,7 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-red-500 h-2 rounded-full"
-                    style={{ width: "5%" }}
+                    style={{ width: "22%" }}
                   ></div>
                 </div>
               </div>
