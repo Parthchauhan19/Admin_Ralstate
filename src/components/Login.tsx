@@ -20,16 +20,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-red-300 to-indigo-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-            <Building2 className="w-8 h-8 text-blue-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+            <Building2 className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">
-            Real Estate Admin
+            Ochi Reality Admin
           </h1>
-          <p className="text-gray-600 mt-2">Sign in to manage properties</p>
+          <p className="text-gray-600 mt-2">Login to manage properties</p>
         </div>
 
         {error && (
@@ -89,10 +89,10 @@ const Login: React.FC = () => {
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                Signing in...
+                Login....
               </>
             ) : (
-              "Sign In"
+              "Login"
             )}
           </button>
         </form>

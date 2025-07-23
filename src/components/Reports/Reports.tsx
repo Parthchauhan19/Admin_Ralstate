@@ -17,7 +17,7 @@ const Reports = () => {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
 
-  // Sample data - in real app, this would come from API
+  // Sample data - in real app, this would come from API when you call the API in beackend
   const dashboardData = {
     totalSales: 156,
     totalRevenue: 4500650,
