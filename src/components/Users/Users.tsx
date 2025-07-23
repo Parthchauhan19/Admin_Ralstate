@@ -39,8 +39,8 @@ const Users: React.FC = () => {
     },
     {
       id: 2,
-      name: "Nency Chauhan",
-      email: "NencyChauhan19@gmail.com",
+      name: "Nency Bhuva",
+      email: "Nencybhuva19@gmail.com",
       role: "admin",
       phone: "+91 9396795573",
       status: "inactive",
@@ -143,7 +143,7 @@ const Users: React.FC = () => {
             Manage system users and their permissions
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+        <button className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors">
           <Plus className="w-5 h-5" />
           Add User
         </button>

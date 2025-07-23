@@ -49,7 +49,7 @@ const agents: Agent[] = [
   },
   {
     id: "2",
-    name: "Nency Chauhan",
+    name: "Nency Bhuva",
     color: "bg-green-500",
     phone: "+91 9713895675",
   },
@@ -305,7 +305,7 @@ function Calender() {
           <div
             key={index}
             className={`min-h-16 sm:min-h-20 md:min-h-24 p-1 border border-gray-200 ${
-              day ? "bg-white hover:bg-gray-50" : "bg-gray-50"
+              day ? "bg-white hover:bg-gray-200" : "bg-gray-50"
             }`}
           >
             {day && (
@@ -474,7 +474,7 @@ function Calender() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6 hover:shadow-lg">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -486,7 +486,7 @@ function Calender() {
             </div>
             <button
               onClick={() => openModal()}
-              className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>New Appointment</span>
@@ -528,7 +528,7 @@ function Calender() {
                     onClick={() => setViewType(view)}
                     className={`px-3 py-1 rounded-lg text-sm font-medium transition-colors ${
                       viewType === view
-                        ? "bg-blue-600 text-white"
+                        ? "bg-red-600 text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
@@ -548,7 +548,7 @@ function Calender() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6">
+        <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-lg">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Agents</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {agents.map((agent) => (
@@ -836,7 +836,7 @@ function AppointmentModal({
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 {isEditing ? "Update" : "Create"}
               </button>

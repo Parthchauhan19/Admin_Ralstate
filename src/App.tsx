@@ -10,6 +10,7 @@ import Settings from "./components/Settings/Settings";
 import Analytics from "./components/Analytics/Analytics";
 import Reports from "./components/Reports/Reports";
 import Calender from "./components/Calender/Calender";
+import Message from "./components/Meassage/Meassage";
 
 function AppContent() {
   const { user } = useAuth();
@@ -37,14 +38,7 @@ function AppContent() {
       case "calendar":
         return <Calender />;
       case "messages":
-        return (
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Messages</h1>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 text-center">
-              <p className="text-gray-600">Messaging system coming soon...</p>
-            </div>
-          </div>
-        );
+        return <Message />;
       default:
         return <Dashboard />;
     }

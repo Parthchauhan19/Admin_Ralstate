@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import React, { useState } from "react";
+import { X } from "lucide-react";
 
 interface Property {
   id: number;
@@ -9,7 +9,7 @@ interface Property {
   bedrooms: number;
   bathrooms: number;
   area: string;
-  status: 'For Sale' | 'For Rent' | 'Sold';
+  status: "For Sale" | "For Rent" | "Sold";
   image: string;
   agent: string;
   type: string;
@@ -17,22 +17,26 @@ interface Property {
 
 interface PropertyFormProps {
   property?: Property | null;
-  onSave: (property: Omit<Property, 'id'>) => void;
+  onSave: (property: Omit<Property, "id">) => void;
   onClose: () => void;
 }
 
-const PropertyForm: React.FC<PropertyFormProps> = ({ property, onSave, onClose }) => {
+const PropertyForm: React.FC<PropertyFormProps> = ({
+  property,
+  onSave,
+  onClose,
+}) => {
   const [formData, setFormData] = useState({
-    title: property?.title || '',
-    price: property?.price || '',
-    location: property?.location || '',
+    title: property?.title || "",
+    price: property?.price || "",
+    location: property?.location || "",
     bedrooms: property?.bedrooms || 1,
     bathrooms: property?.bathrooms || 1,
-    area: property?.area || '',
-    status: property?.status || 'For Sale' as const,
-    image: property?.image || '',
-    agent: property?.agent || '',
-    type: property?.type || 'House'
+    area: property?.area || "",
+    status: property?.status || ("For Sale" as const),
+    image: property?.image || "",
+    agent: property?.agent || "",
+    type: property?.type || "House",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -40,11 +44,16 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onSave, onClose }
     onSave(formData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === 'bedrooms' || name === 'bathrooms' ? parseInt(value) : value
+      [name]:
+        name === "bedrooms" || name === "bathrooms" ? parseInt(value) : value,
     }));
   };
 
@@ -53,7 +62,7 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onSave, onClose }
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {property ? 'Edit Property' : 'Add New Property'}
+            {property ? "Edit Property" : "Add New Property"}
           </h2>
           <button
             onClick={onClose}
@@ -230,9 +239,9 @@ const PropertyForm: React.FC<PropertyFormProps> = ({ property, onSave, onClose }
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              {property ? 'Update Property' : 'Add Property'}
+              {property ? "Update Property" : "Add Property"}
             </button>
           </div>
         </form>

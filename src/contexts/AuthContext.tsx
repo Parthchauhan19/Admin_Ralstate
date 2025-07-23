@@ -47,11 +47,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Mock authentication - in real app, this would be an API call
-    if (email === "admin@realestate.com" && password === "admin123") {
+    if (email === "ochireality@Admin.com" && password === "admin123") {
       const userData: User = {
         id: "1",
         name: "Parth Chauhan",
-        email: "admin@realestate.com",
+        email: "ochireality@Admin.com",
         role: "admin",
         avatar:
           "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150",

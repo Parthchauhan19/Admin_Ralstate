@@ -142,7 +142,7 @@ const Reports = () => {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
               <Download className="w-4 h-4" />
               Export Report
             </button>
@@ -471,7 +471,7 @@ const Reports = () => {
               <button className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">
                 Previous
               </button>
-              <button className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+              <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
                 Next
               </button>
             </div>

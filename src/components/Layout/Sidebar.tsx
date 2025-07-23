@@ -57,10 +57,10 @@ const Sidebar: React.FC<SidebarProps> = ({
           isOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 lg:static lg:z-0`}
       >
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-6 border-b border-gray-200 cursor-pointer">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center">
                 <Building className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-4 border-b border-gray-200 cursor-pointer">
           <div className="flex items-center gap-3">
             <img
               src={
