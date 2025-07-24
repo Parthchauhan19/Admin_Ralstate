@@ -50,7 +50,6 @@ const Settings: React.FC = () => {
   ];
 
   const handleSave = () => {
-    // Simulate saving settings
     alert("Settings saved successfully!");
   };
 
