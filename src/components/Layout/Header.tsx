@@ -1,6 +1,7 @@
-import React from 'react';
-import { Menu, Bell, Search, LogOut, User } from 'lucide-react';
-import { useAuth } from '../../contexts/AuthContext';
+import React from "react";
+import { Menu, Bell, Search, LogOut, User } from "lucide-react";
+import { useAuth } from "../../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -8,6 +9,11 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate("/profile");
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-6">
@@ -19,7 +25,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           >
             <Menu className="w-5 h-5" />
           </button>
-          
+
           <div className="relative hidden md:block">
             <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
             <input
@@ -39,7 +45,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           <div className="relative group">
             <button className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <img
-                src={user?.avatar || 'https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150'}
+                src={
+                  user?.avatar ||
+                  "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150"
+                }
                 alt="User"
                 className="w-8 h-8 rounded-full object-cover"
               />
@@ -47,11 +56,13 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                 {user?.name}
               </span>
             </button>
-            
-            
+
             <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
               <div className="p-2">
-                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+                <button
+                  onClick={handleProfileClick}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <User className="w-4 h-4" />
                   Profile
                 </button>

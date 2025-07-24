@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+
 import Login from "./components/Login";
 import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
+
 import Dashboard from "./components/Dashboard/Dashboard";
 import Properties from "./components/Properties/Properties";
 import Users from "./components/Users/Users";
@@ -11,60 +19,58 @@ import Analytics from "./components/Analytics/Analytics";
 import Reports from "./components/Reports/Reports";
 import Calender from "./components/Calender/Calender";
 import Message from "./components/Meassage/Meassage";
+import Profile from "./components/Profile/Profile"; // ✅ Import your Profile page
 
-function AppContent() {
+function ProtectedLayout() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
-  if (!user) {
-    return <Login />;
-  }
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case "dashboard":
-        return <Dashboard />;
-      case "properties":
-        return <Properties />;
-      case "users":
-        return <Users />;
-      case "settings":
-        return <Settings />;
-      case "analytics":
-        return <Analytics />;
-      case "reports":
-        return <Reports />;
-      case "calendar":
-        return <Calender />;
-      case "messages":
-        return <Message />;
-      default:
-        return <Dashboard />;
-    }
-  };
+  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
-
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 overflow-y-auto">{renderContent()}</main>
+        <main className="flex-1 overflow-y-auto p-4">
+          <Routes>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/properties" element={<Properties />} />
+            <Route path="/users" element={<Users />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/calendar" element={<Calender />} />
+            <Route path="/messages" element={<Message />} />
+            <Route path="/profile" element={<Profile />} /> {/* ✅ New route */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </main>
       </div>
     </div>
+  );
+}
+
+function AppRoutes() {
+  const { user } = useAuth();
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
+      />
+      <Route path="/*" element={<ProtectedLayout />} />
+    </Routes>
   );
 }
 
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Router>
+        <AppRoutes />
+      </Router>
     </AuthProvider>
   );
 }

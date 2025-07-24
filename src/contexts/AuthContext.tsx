@@ -17,10 +17,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
@@ -33,10 +32,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored user session
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        localStorage.removeItem("user");
+      }
     }
     setIsLoading(false);
   }, []);
@@ -44,38 +46,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const login = async (email: string, password: string): Promise<boolean> => {
     setIsLoading(true);
 
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Mock authentication - in real app, this would be an API call
-    if (email === "ochireality@Admin.com" && password === "admin123") {
-      const userData: User = {
-        id: "1",
-        name: "Parth Chauhan",
-        email: "ochireality@Admin.com",
-        role: "admin",
-        avatar:
-          "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150",
-      };
+    const userMap: Record<string, { password: string; data: User }> = {
+      "ochireality@Admin.com": {
+        password: "admin123",
+        data: {
+          id: "01_PN1072003",
+          name: "Parth Chauhan",
+          email: "ochireality@Admin.com",
+          role: "admin",
+          avatar:
+            "https://images.pexels.com/photos/2379004/pexels-photo-2379004.jpeg?auto=compress&cs=tinysrgb&w=150",
+        },
+      },
+      "ochireality@Admin2.com": {
+        password: "admin456",
+        data: {
+          id: "02_NP1982004",
+          name: "Nency Bhuva",
+          email: "ochireality@Admin2.com",
+          role: "admin",
+          avatar:
+            "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150",
+        },
+      },
+    };
 
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
-      setIsLoading(false);
-      return true;
-    }
-
-    if (email === "ochireality@Admin2.com" && password === "admin456") {
-      const userData: User = {
-        id: "2",
-        name: "Nency Bhuva",
-        email: "ochireality@Admin2.com",
-        role: "admin",
-        avatar:
-          "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=150",
-      };
-
-      setUser(userData);
-      localStorage.setItem("user", JSON.stringify(userData));
+    const account = userMap[email];
+    if (account && account.password === password) {
+      setUser(account.data);
+      localStorage.setItem("user", JSON.stringify(account.data));
       setIsLoading(false);
       return true;
     }

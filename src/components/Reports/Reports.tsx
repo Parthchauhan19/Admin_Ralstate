@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import Demorampe from "./Demorampe";
+
 import {
   TrendingUp,
   DollarSign,
@@ -425,6 +427,7 @@ const Reports = () => {
                 </th>
               </tr>
             </thead>
+
             <tbody className="bg-white divide-y divide-gray-200">
               {recentTransactions.map((transaction) => (
                 <tr key={transaction.id} className="hover:bg-gray-100">
@@ -502,6 +505,7 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      <Demorampe />
     </div>
   );
 };
