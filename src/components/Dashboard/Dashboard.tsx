@@ -129,7 +129,7 @@ const Dashboard: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900">
             Recent UpDates On Properties
           </h2>
-          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+          <button className="text-red-600 hover:text-red-700 text-sm font-medium">
             View All
           </button>
         </div>

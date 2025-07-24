@@ -102,8 +102,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               onClick={() => handleItemClick(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                 currentPath === item.id
-                  ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
-                  : "text-gray-700 hover:bg-gray-50"
+                  ? "bg-red-50 text-red-600 border-r-2 border-red-600"
+                  : "text-gray-700 hover:bg-red-50 hover:text-red-600"
               }`}
             >
               <item.icon className="w-5 h-5" />
