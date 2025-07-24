@@ -19,7 +19,7 @@ import Analytics from "./components/Analytics/Analytics";
 import Reports from "./components/Reports/Reports";
 import Calender from "./components/Calender/Calender";
 import Message from "./components/Meassage/Meassage";
-import Profile from "./components/Profile/Profile"; // ✅ Import your Profile page
+import Profile from "./components/Profile/Profile";
 
 function ProtectedLayout() {
   const { user } = useAuth();
@@ -42,7 +42,7 @@ function ProtectedLayout() {
             <Route path="/reports" element={<Reports />} />
             <Route path="/calendar" element={<Calender />} />
             <Route path="/messages" element={<Message />} />
-            <Route path="/profile" element={<Profile />} /> {/* ✅ New route */}
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>

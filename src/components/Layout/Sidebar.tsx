@@ -2,7 +2,7 @@ import React from "react";
 import {
   Home,
   Building,
-  Users,
+  Users as UsersIcon,
   Settings,
   BarChart3,
   FileText,
@@ -10,36 +10,35 @@ import {
   MessageSquare,
   X,
 } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
 interface SidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
-  activeTab,
-  setActiveTab,
-  isOpen,
-  onClose,
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const menuItems = [
     { id: "dashboard", icon: Home, label: "Dashboard" },
     { id: "properties", icon: Building, label: "Properties" },
-    { id: "users", icon: Users, label: "Users" },
+    { id: "users", icon: UsersIcon, label: "Users" },
     { id: "analytics", icon: BarChart3, label: "Analytics" },
     { id: "reports", icon: FileText, label: "Reports" },
     { id: "calendar", icon: Calendar, label: "Calendar" },
     { id: "messages", icon: MessageSquare, label: "Messages" },
+    { id: "profile", icon: UsersIcon, label: "Profile" },
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
+  const currentPath = location.pathname.split("/")[1];
+
   const handleItemClick = (id: string) => {
-    setActiveTab(id);
+    navigate(`/${id}`);
     onClose();
   };
 
@@ -102,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               key={item.id}
               onClick={() => handleItemClick(item.id)}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                activeTab === item.id
+                currentPath === item.id
                   ? "bg-blue-50 text-blue-600 border-r-2 border-blue-600"
                   : "text-gray-700 hover:bg-gray-50"
               }`}
