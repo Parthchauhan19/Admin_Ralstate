@@ -137,6 +137,39 @@ const PushNotificationManager: React.FC = () => {
       status: "Active",
       createdAt: "14 Jun, 2025",
     },
+    {
+      id: "#7471",
+      title: "Holiday Greetings",
+      userGroup: "All Users",
+      city: "All Cities",
+      activeFrom: "2025-08-01",
+      activeUntil: "2025-08-15",
+      message: "Wishing you a happy Independence Day!",
+      status: "Active",
+      createdAt: "01 Aug, 2025",
+    },
+    {
+      id: "#7472",
+      title: "Security Update",
+      userGroup: "Enterprise Users",
+      city: "Mumbai",
+      activeFrom: "2025-07-10",
+      activeUntil: "2025-08-10",
+      message: "Important security updates have been applied to your account.",
+      status: "Active",
+      createdAt: "10 Jul, 2025",
+    },
+    {
+      id: "#7473",
+      title: "Seasonal Discount",
+      userGroup: "Premium Users",
+      city: "Surat",
+      activeFrom: "2025-06-20",
+      activeUntil: "2025-07-20",
+      message: "Monsoon season special offers just for you!",
+      status: "Inactive",
+      createdAt: "20 Jun, 2025",
+    },
   ]);
 
   const [showModal, setShowModal] = useState(false);
@@ -144,6 +177,7 @@ const PushNotificationManager: React.FC = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [editingNotification, setEditingNotification] =
     useState<PushNotification | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState<NotificationFormData>({
     title: "",
     userGroup: "",
@@ -162,16 +196,21 @@ const PushNotificationManager: React.FC = () => {
     "Free Users",
     "Retail Users",
     "Enterprise Users",
+    "Frequent Users",
   ];
   const cities = [
     "All Cities",
     "Mumbai",
     "Ahmedabad",
     "Rajkot",
-    "Morbi",
+    "Surat",
+    "Vadodara",
     "Gandhinagar",
     "Gujarat",
+    "Morbi",
   ];
+
+  const itemsPerPage = 10;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -208,12 +247,8 @@ const PushNotificationManager: React.FC = () => {
     if (editingNotification) {
       const updatedNotification: PushNotification = {
         ...editingNotification,
-        title: formData.title,
-        userGroup: formData.userGroup,
+        ...formData,
         city: formData.city || "All Cities",
-        activeFrom: formData.activeFrom,
-        activeUntil: formData.activeUntil,
-        message: formData.message,
       };
 
       setNotifications((prev) =>
@@ -226,12 +261,8 @@ const PushNotificationManager: React.FC = () => {
     } else {
       const newNotification: PushNotification = {
         id: `#${Math.floor(Math.random() * 9000) + 1000}`,
-        title: formData.title,
-        userGroup: formData.userGroup,
+        ...formData,
         city: formData.city || "All Cities",
-        activeFrom: formData.activeFrom,
-        activeUntil: formData.activeUntil,
-        message: formData.message,
         status: "Active",
         createdAt: new Date().toLocaleDateString("en-GB", {
           day: "2-digit",
@@ -304,9 +335,15 @@ const PushNotificationManager: React.FC = () => {
       notification.city.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
+  const paginatedNotifications = filteredNotifications.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto ">
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 space-y-4 sm:space-y-0">
           <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-4 sm:space-y-0">
             <h1 className="text-2xl font-semibold text-gray-900">
@@ -365,10 +402,10 @@ const PushNotificationManager: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredNotifications.map((notification) => (
+                {paginatedNotifications.map((notification) => (
                   <tr
                     key={notification.id}
-                    className="hover:bg-gray-100 hover:shadow-lg cursor-pointer"
+                    className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="py-4 px-6 text-blue-600 font-medium">
                       {notification.id}
@@ -439,28 +476,55 @@ const PushNotificationManager: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center mt-6">
+        {/* Pagination */}
+        <div className="flex justify-between items-center mt-6 flex-wrap gap-2">
           <p className="text-sm text-gray-600">
-            Showing {filteredNotifications.length} of {notifications.length}{" "}
-            results
+            Showing {paginatedNotifications.length} of{" "}
+            {filteredNotifications.length} results
           </p>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === 1
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "border border-gray-300 hover:bg-gray-100"
+              }`}
+            >
               Previous
             </button>
-            <button className="px-3 py-1 text-sm bg-red-500 hover:bg-red-600 text-white rounded">
-              1
-            </button>
-            <button className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100">
-              2
-            </button>
-            <button className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-100">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                className={`px-3 py-1 text-sm rounded ${
+                  currentPage === i + 1
+                    ? "bg-red-500 text-white"
+                    : "border border-gray-300 hover:bg-gray-100"
+                }`}
+              >
+                {i + 1}
+              </button>
+            ))}
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 text-sm rounded ${
+                currentPage === totalPages
+                  ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                  : "border border-gray-300 hover:bg-gray-100"
+              }`}
+            >
               Next
             </button>
           </div>
         </div>
       </div>
 
+      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-3xl mx-4">
@@ -534,32 +598,28 @@ const PushNotificationManager: React.FC = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Active from
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={formData.activeFrom}
-                    onChange={(e) =>
-                      handleInputChange("activeFrom", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={formData.activeFrom}
+                  onChange={(e) =>
+                    handleInputChange("activeFrom", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Active until
                 </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={formData.activeUntil}
-                    onChange={(e) =>
-                      handleInputChange("activeUntil", e.target.value)
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <input
+                  type="date"
+                  value={formData.activeUntil}
+                  onChange={(e) =>
+                    handleInputChange("activeUntil", e.target.value)
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
               </div>
 
               <div>
