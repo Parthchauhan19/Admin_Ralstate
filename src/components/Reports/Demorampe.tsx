@@ -379,14 +379,7 @@ const Demorampe: React.FC = () => {
 
       {teamMembers.length === 0 && (
         <div className="text-center py-12 text-gray-500">
-          <p className="text-lg mb-4">No team members found</p>
-          <button
-            onClick={handleAddMember}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <Plus size={16} />
-            Add Your First Team Member
-          </button>
+          <p className="text-lg">No team members found / Please add team members.</p>
         </div>
       )}
     </div>

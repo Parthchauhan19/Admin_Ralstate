@@ -31,7 +31,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { id: "reports", icon: FileText, label: "Reports" },
     { id: "calendar", icon: Calendar, label: "Calendar" },
     { id: "messages", icon: MessageSquare, label: "Messages" },
-    { id: "profile", icon: UsersIcon, label: "Profile" },
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
