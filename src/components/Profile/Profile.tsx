@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Copy, Eye, Key, Trash2 } from "lucide-react";
-import { useAuth } from "../../contexts/AuthContext";
+// import { useAuth } from "../../contexts/AuthContext";
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
 
   const [personalInfo, setPersonalInfo] = useState({
     firstName: "",

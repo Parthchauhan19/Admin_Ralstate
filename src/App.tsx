@@ -4,13 +4,12 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 import Login from "./components/Login";
 import Sidebar from "./components/Layout/Sidebar";
 import Header from "./components/Layout/Header";
-
 import Dashboard from "./components/Dashboard/Dashboard";
 import Properties from "./components/Properties/Properties";
 import Users from "./components/Users/Users";
@@ -20,12 +19,24 @@ import Reports from "./components/Reports/Reports";
 import Calender from "./components/Calender/Calender";
 import Message from "./components/Meassage/Meassage";
 import Profile from "./components/Profile/Profile";
+import PropertyForm from "./components/Properties/PropertyForm";
+
+// Helper to check login status
+const isAuthenticated = () => {
+  return localStorage.getItem("token") !== null;
+};
+
+// Protected wrapper
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const location = useLocation();
+  if (!isAuthenticated()) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  return children;
+}
 
 function ProtectedLayout() {
-  const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
-
-  if (!user) return <Navigate to="/login" replace />;
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -36,6 +47,7 @@ function ProtectedLayout() {
           <Routes>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/properties" element={<Properties />} />
+            <Route path="/properties-form" element={<PropertyForm />} />
             <Route path="/users" element={<Users />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/analytics" element={<Analytics />} />
@@ -43,7 +55,6 @@ function ProtectedLayout() {
             <Route path="/calendar" element={<Calender />} />
             <Route path="/messages" element={<Message />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>
       </div>
@@ -52,26 +63,26 @@ function ProtectedLayout() {
 }
 
 function AppRoutes() {
-  const { user } = useAuth();
-
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
       <Route
-        path="/login"
-        element={!user ? <Login /> : <Navigate to="/dashboard" replace />}
+        path="/*"
+        element={
+          <RequireAuth>
+            <ProtectedLayout />
+          </RequireAuth>
+        }
       />
-      <Route path="/*" element={<ProtectedLayout />} />
     </Routes>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 

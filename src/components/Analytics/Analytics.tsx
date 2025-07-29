@@ -335,11 +335,11 @@ const Analytics: React.FC = () => {
         </table>
       </div>
 
-      <h2 className="mt-6 text-2xl font-semibold text-gray-900 mb-4 capitalize flex items-center justify-between">
+      <h2 className="mt-6 text-2xl font-semibold text-gray-900 mb-4 capitalize flex items-center justify-between flex-col sm:flex-row sm:items-center sm:justify-between">
         employes Efforts To (Visits, Find-Property) (Monthly)
         <button
           onClick={() => setShowBarModal(true)}
-          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors sm:w-auto mt-5"
         >
           <Plus size={16} />
           <span>Add Data</span>
@@ -367,11 +367,11 @@ const Analytics: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
-      <h2 className="text-2xl font-semibold text-gray-900 mt-20 mb-8 capitalize flex items-center justify-between">
-        Individual Property Type Distribution (Per employe)
+      <h2 className="text-2xl font-semibold text-gray-900 mt-20 mb-8 capitalize flex items-center justify-between flex-col sm:flex-row sm:items-center sm:justify-between">
+        Individual Property Type Distribution (Per-employe)
         <button
           onClick={() => setShowPieModal(true)}
-          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors sm:w-auto mt-5"
         >
           <Plus size={16} />
           <span>Add Data</span>

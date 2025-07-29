@@ -1,48 +1,24 @@
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import { Link } from "react-router-dom";
+import axios from "axios";
+import { API_URL } from "../Server/Server";
 
-interface Property {
-  id: number;
-  title: string;
-  price: string;
-  location: string;
-  bedrooms: number;
-  bathrooms: number;
-  area: string;
-  status: "For Sale" | "For Rent" | "Sold";
-  image: string;
-  agent: string;
-  type: string;
-}
-
-interface PropertyFormProps {
-  property?: Property | null;
-  onSave: (property: Omit<Property, "id">) => void;
-  onClose: () => void;
-}
-
-const PropertyForm: React.FC<PropertyFormProps> = ({
-  property,
-  onSave,
-  onClose,
-}) => {
+const PropertyForm: React.FC = () => {
   const [formData, setFormData] = useState({
-    title: property?.title || "",
-    price: property?.price || "",
-    location: property?.location || "",
-    bedrooms: property?.bedrooms || 1,
-    bathrooms: property?.bathrooms || 1,
-    area: property?.area || "",
-    status: property?.status || ("For Sale" as const),
-    image: property?.image || "",
-    agent: property?.agent || "",
-    type: property?.type || "House",
+    propertyTitle: "",
+    price: "",
+    location: "",
+    bedroom: 1,
+    bathroom: 1,
+    area: "",
+    status: "For Sale",
+    image: "",
+    agent: "",
+    propertyType: "House",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSave(formData);
-  };
+  const [error, setError] = useState("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -53,8 +29,38 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
     setFormData((prev) => ({
       ...prev,
       [name]:
-        name === "bedrooms" || name === "bathrooms" ? parseInt(value) : value,
+        name === "bedroom" || name === "bathroom" ? parseInt(value) : value,
     }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post(`${API_URL}property/create`, formData);
+      console.log("Saved Property:", res.data);
+
+      alert("Property added successfully!");
+
+      // Reset form
+      setFormData({
+        propertyTitle: "",
+        price: "",
+        location: "",
+        bedroom: 1,
+        bathroom: 1,
+        area: "",
+        status: "For Sale",
+        image: "",
+        agent: "",
+        propertyType: "House",
+      });
+    } catch (error: any) {
+      console.error("Error saving property:", error);
+      const errorMessage =
+        error.response?.data?.message || "Failed to add property";
+      setError(errorMessage);
+      alert(errorMessage);
+    }
   };
 
   return (
@@ -62,186 +68,122 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">
-            {property ? "Edit Property" : "Add New Property"}
+            Add New Property
           </h2>
-          <button
-            onClick={onClose}
+          <Link
+            to="/properties"
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
-          </button>
+          </Link>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter property title"
-              />
-            </div>
+            <InputField
+              label="Property Title"
+              name="propertyTitle"
+              value={formData.propertyTitle}
+              onChange={handleChange}
+              placeholder="Enter property title"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Price
-              </label>
-              <input
-                type="text"
-                name="price"
-                value={formData.price}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., $850,000"
-              />
-            </div>
+            <InputField
+              label="Price"
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="e.g., $850,000"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Location
-              </label>
-              <input
-                type="text"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter location"
-              />
-            </div>
+            <InputField
+              label="Location"
+              name="location"
+              value={formData.location}
+              onChange={handleChange}
+              placeholder="Enter location"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Property Type
-              </label>
-              <select
-                name="type"
-                value={formData.type}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="House">House</option>
-                <option value="Apartment">Apartment</option>
-                <option value="Villa">Villa</option>
-                <option value="Condo">Condo</option>
-                <option value="Townhouse">Townhouse</option>
-              </select>
-            </div>
+            <SelectField
+              label="Property Type"
+              name="propertyType"
+              value={formData.propertyType}
+              onChange={handleChange}
+              options={["House", "Apartment", "Villa", "Condo", "Townhouse"]}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bedrooms
-              </label>
-              <input
-                type="number"
-                name="bedrooms"
-                value={formData.bedrooms}
-                onChange={handleChange}
-                min="1"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <InputField
+              label="Bedrooms"
+              name="bedroom"
+              value={formData.bedroom}
+              onChange={handleChange}
+              type="number"
+              min={1}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Bathrooms
-              </label>
-              <input
-                type="number"
-                name="bathrooms"
-                value={formData.bathrooms}
-                onChange={handleChange}
-                min="1"
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
+            <InputField
+              label="Bathrooms"
+              name="bathroom"
+              value={formData.bathroom}
+              onChange={handleChange}
+              type="number"
+              min={1}
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Area
-              </label>
-              <input
-                type="text"
-                name="area"
-                value={formData.area}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g., 2,500 sq ft"
-              />
-            </div>
+            <InputField
+              label="Area"
+              name="area"
+              value={formData.area}
+              onChange={handleChange}
+              placeholder="e.g., 2,500 sq ft"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Status
-              </label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                <option value="For Sale">For Sale</option>
-                <option value="For Rent">For Rent</option>
-                <option value="Sold">Sold</option>
-              </select>
-            </div>
+            <SelectField
+              label="Status"
+              name="status"
+              value={formData.status}
+              onChange={handleChange}
+              options={["For Sale", "For Rent", "Sold"]}
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Agent
-              </label>
-              <input
-                type="text"
-                name="agent"
-                value={formData.agent}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter agent name"
-              />
-            </div>
+            <InputField
+              label="Agent"
+              name="agent"
+              value={formData.agent}
+              onChange={handleChange}
+              placeholder="Enter agent name"
+              required
+            />
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL
-              </label>
-              <input
-                type="url"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter image URL"
-              />
-            </div>
+            <InputField
+              label="Image URL"
+              name="image"
+              type="url"
+              value={formData.image}
+              onChange={handleChange}
+              placeholder="Enter image URL"
+              required
+            />
           </div>
 
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
-            <button
-              type="button"
-              onClick={onClose}
+            <Link
+              to="/properties"
               className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
             >
               Cancel
-            </button>
+            </Link>
             <button
               type="submit"
               className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
-              {property ? "Update Property" : "Add Property"}
+              Save
             </button>
           </div>
         </form>
@@ -249,5 +191,72 @@ const PropertyForm: React.FC<PropertyFormProps> = ({
     </div>
   );
 };
+
+// Reusable InputField Component
+const InputField = ({
+  label,
+  name,
+  value,
+  onChange,
+  placeholder,
+  type = "text",
+  ...rest
+}: {
+  label: string;
+  name: string;
+  value: any;
+  onChange: React.ChangeEventHandler;
+  placeholder?: string;
+  type?: string;
+  [key: string]: any;
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label}
+    </label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={onChange}
+      placeholder={placeholder}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+      {...rest}
+    />
+  </div>
+);
+
+// Reusable SelectField Component
+const SelectField = ({
+  label,
+  name,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: React.ChangeEventHandler;
+  options: string[];
+}) => (
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      {label}
+    </label>
+    <select
+      name={name}
+      value={value}
+      onChange={onChange}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+    >
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
+  </div>
+);
 
 export default PropertyForm;
