@@ -8,6 +8,7 @@ import {
   Eye,
   MapPin,
   Bed,
+  Loader,
   Bath,
   Square,
   AlertCircle,
@@ -59,6 +60,7 @@ const Properties: React.FC = () => {
       } else {
         setProperties(Array.isArray(response.data) ? response.data : []);
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Error fetching properties:", err);
       setError("Failed to fetch properties. Please try again.");
@@ -101,6 +103,7 @@ const Properties: React.FC = () => {
       } else {
         setError("Failed to delete the property.");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Failed to delete property:", err);
       const errorMessage =
@@ -133,12 +136,12 @@ const Properties: React.FC = () => {
 
         alert("Property updated successfully!");
 
-        // ✅ Automatically close modal
         setShowForm(false);
         setEditingProperty(null);
       } else {
         setError("Failed to update property.");
       }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error("Update failed:", err);
       setError(err.response?.data?.message || "Failed to update property");
@@ -215,9 +218,11 @@ const Properties: React.FC = () => {
       </div>
 
       {loading ? (
-        <div className="text-center py-8">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-          <p className="mt-2 text-gray-600">Loading properties...</p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex items-center justify-center min-h-96">
+          <div className="flex items-center space-x-2">
+            <Loader className="animate-spin" size={20} />
+            <span>Loading analytics data...</span>
+          </div>
         </div>
       ) : filteredProperties.length === 0 ? (
         <div className="text-center py-8">
@@ -311,7 +316,6 @@ const Properties: React.FC = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       {showForm && editingProperty && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-xl p-6 rounded-lg relative">
@@ -340,6 +344,7 @@ const Properties: React.FC = () => {
                 <input
                   key={field}
                   name={field}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   value={(editingProperty as any)[field]}
                   onChange={handleInputChange}
                   placeholder={field}

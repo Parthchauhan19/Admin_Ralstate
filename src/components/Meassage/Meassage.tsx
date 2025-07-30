@@ -35,141 +35,6 @@ const PushNotificationManager: React.FC = () => {
       status: "Active",
       createdAt: "15 Jan, 2025",
     },
-    {
-      id: "#7462",
-      title: "Weekend Sale",
-      userGroup: "Premium Users",
-      city: "Ahmedabad",
-      activeFrom: "2025-06-01",
-      activeUntil: "2025-06-30",
-      message: "Special weekend discounts available!",
-      status: "Inactive",
-      createdAt: "01 Jun, 2025",
-    },
-    {
-      id: "#7463",
-      title: "App Update",
-      userGroup: "All Users",
-      city: "All Cities",
-      activeFrom: "2025-07-01",
-      activeUntil: "2025-07-31",
-      message: "New app version available for download.",
-      status: "Active",
-      createdAt: "01 Jul, 2025",
-    },
-    {
-      id: "#7464",
-      title: "Power Saving Tips",
-      userGroup: "All Users",
-      city: "Gujarat",
-      activeFrom: "2025-07-20",
-      activeUntil: "2025-08-05",
-      message:
-        "Learn how to reduce your electricity usage this summer in Gujarat.",
-      status: "Inactive",
-      createdAt: "20 Jul, 2025",
-    },
-    {
-      id: "#7465",
-      title: "Local Festival Offers",
-      userGroup: "Retail Users",
-      city: "Gandhinagar",
-      activeFrom: "2025-07-15",
-      activeUntil: "2025-08-01",
-      message:
-        "Special discounts available for Gujarat customers during Rath Yatra week.",
-      status: "Active",
-      createdAt: "15 Jul, 2025",
-    },
-    {
-      id: "#7466",
-      title: "Service Downtime Notice",
-      userGroup: "Enterprise Users",
-      city: "Rajkot",
-      activeFrom: "2025-07-25",
-      activeUntil: "2025-07-26",
-      message:
-        "Brief service interruption in Gujarat due to infrastructure upgrades.",
-      status: "Inactive",
-      createdAt: "23 Jul, 2025",
-    },
-    {
-      id: "#7467",
-      title: "Welcome Notification",
-      userGroup: "New Users",
-      city: "Ahmedabad",
-      activeFrom: "2025-01-15",
-      activeUntil: "2025-12-31",
-      message: "Welcome to our platform!",
-      status: "Active",
-      createdAt: "15 Jan, 2025",
-    },
-    {
-      id: "#7468",
-      title: "Feature Update Alert",
-      userGroup: "All Users",
-      city: "Surat",
-      activeFrom: "2025-05-01",
-      activeUntil: "2025-08-01",
-      message: "Check out the new features added this month!",
-      status: "Active",
-      createdAt: "30 Apr, 2025",
-    },
-    {
-      id: "#7469",
-      title: "Maintenance Notice",
-      userGroup: "Premium Users",
-      city: "Vadodara",
-      activeFrom: "2025-07-01",
-      activeUntil: "2025-07-02",
-      message: "Scheduled maintenance on 1st July, expect downtime.",
-      status: "Inactive",
-      createdAt: "28 Jun, 2025",
-    },
-    {
-      id: "#7470",
-      title: "Survey Invitation",
-      userGroup: "Frequent Users",
-      city: "Rajkot",
-      activeFrom: "2025-06-15",
-      activeUntil: "2025-07-31",
-      message: "Help us improve! Take our quick 2-min survey.",
-      status: "Active",
-      createdAt: "14 Jun, 2025",
-    },
-    {
-      id: "#7471",
-      title: "Holiday Greetings",
-      userGroup: "All Users",
-      city: "All Cities",
-      activeFrom: "2025-08-01",
-      activeUntil: "2025-08-15",
-      message: "Wishing you a happy Independence Day!",
-      status: "Active",
-      createdAt: "01 Aug, 2025",
-    },
-    {
-      id: "#7472",
-      title: "Security Update",
-      userGroup: "Enterprise Users",
-      city: "Mumbai",
-      activeFrom: "2025-07-10",
-      activeUntil: "2025-08-10",
-      message: "Important security updates have been applied to your account.",
-      status: "Active",
-      createdAt: "10 Jul, 2025",
-    },
-    {
-      id: "#7473",
-      title: "Seasonal Discount",
-      userGroup: "Premium Users",
-      city: "Surat",
-      activeFrom: "2025-06-20",
-      activeUntil: "2025-07-20",
-      message: "Monsoon season special offers just for you!",
-      status: "Inactive",
-      createdAt: "20 Jun, 2025",
-    },
   ]);
 
   const [showModal, setShowModal] = useState(false);
@@ -356,7 +221,7 @@ const PushNotificationManager: React.FC = () => {
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-full sm:w-64"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent w-full sm:w-64"
               />
             </div>
           </div>
@@ -476,7 +341,6 @@ const PushNotificationManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Pagination */}
         <div className="flex justify-between items-center mt-6 flex-wrap gap-2">
           <p className="text-sm text-gray-600">
             Showing {paginatedNotifications.length} of{" "}
@@ -524,7 +388,6 @@ const PushNotificationManager: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-3xl mx-4">
@@ -552,7 +415,7 @@ const PushNotificationManager: React.FC = () => {
                   placeholder="Title here..."
                   value={formData.title}
                   onChange={(e) => handleInputChange("title", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -565,7 +428,7 @@ const PushNotificationManager: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("userGroup", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="">Select user group</option>
                   {userGroups.map((group) => (
@@ -583,7 +446,7 @@ const PushNotificationManager: React.FC = () => {
                 <select
                   value={formData.city}
                   onChange={(e) => handleInputChange("city", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 >
                   <option value="">City</option>
                   {cities.map((city) => (
@@ -604,7 +467,7 @@ const PushNotificationManager: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("activeFrom", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -618,7 +481,7 @@ const PushNotificationManager: React.FC = () => {
                   onChange={(e) =>
                     handleInputChange("activeUntil", e.target.value)
                   }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                 />
               </div>
 
@@ -631,7 +494,7 @@ const PushNotificationManager: React.FC = () => {
                   placeholder="Message"
                   value={formData.message}
                   onChange={(e) => handleInputChange("message", e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-none"
                 />
               </div>
             </div>

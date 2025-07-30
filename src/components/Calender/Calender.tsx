@@ -92,6 +92,12 @@ const properties: Property[] = [
     type: "Townhouse",
     price: "₹58,00,000",
   },
+  {
+    id: "5",
+    address: "16 vijya Park, Kalawad Road, Morbi",
+    type: "house",
+    price: "₹78,00,000",
+  },
 ];
 
 const initialAppointments: Appointment[] = [
@@ -608,7 +614,7 @@ function AppointmentModal({
     agentId: appointment?.agentId || agents[0]?.id || "",
     propertyId: appointment?.propertyId || properties[0]?.id || "",
     clientName: appointment?.clientName || "",
-    clientPhone: appointment?.clientPhone || "",
+    clientPhone: appointment?.clientPhone || "+91 ",
     status: appointment?.status || "scheduled",
     notes: appointment?.notes || "",
   });
@@ -647,7 +653,7 @@ function AppointmentModal({
                 onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
@@ -664,7 +670,7 @@ function AppointmentModal({
                     status: e.target.value as Appointment["status"],
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               >
                 <option value="scheduled">Scheduled</option>
                 <option value="confirmed">Confirmed</option>
@@ -685,7 +691,7 @@ function AppointmentModal({
                 onChange={(e) =>
                   setFormData({ ...formData, date: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
@@ -700,7 +706,7 @@ function AppointmentModal({
                 onChange={(e) =>
                   setFormData({ ...formData, time: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
@@ -718,7 +724,7 @@ function AppointmentModal({
                     duration: parseInt(e.target.value),
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 min="15"
                 step="15"
                 required
@@ -735,7 +741,7 @@ function AppointmentModal({
               onChange={(e) =>
                 setFormData({ ...formData, agentId: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             >
               {agents.map((agent) => (
@@ -755,7 +761,7 @@ function AppointmentModal({
               onChange={(e) =>
                 setFormData({ ...formData, propertyId: e.target.value })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               required
             >
               {properties.map((property) => (
@@ -777,7 +783,7 @@ function AppointmentModal({
                 onChange={(e) =>
                   setFormData({ ...formData, clientName: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
@@ -792,7 +798,7 @@ function AppointmentModal({
                 onChange={(e) =>
                   setFormData({ ...formData, clientPhone: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                 required
               />
             </div>
@@ -808,7 +814,7 @@ function AppointmentModal({
                 setFormData({ ...formData, notes: e.target.value })
               }
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
               placeholder="Additional notes about the appointment..."
             />
           </div>

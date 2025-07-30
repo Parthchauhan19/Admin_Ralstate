@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../Server/Server";
 
+
 const PropertyForm: React.FC = () => {
   const [formData, setFormData] = useState({
     propertyTitle: "",
@@ -18,6 +19,7 @@ const PropertyForm: React.FC = () => {
     propertyType: "House",
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = useState("");
 
   const handleChange = (
@@ -54,6 +56,7 @@ const PropertyForm: React.FC = () => {
         agent: "",
         propertyType: "House",
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Error saving property:", error);
       const errorMessage =
@@ -94,7 +97,7 @@ const PropertyForm: React.FC = () => {
               name="price"
               value={formData.price}
               onChange={handleChange}
-              placeholder="e.g., $850,000"
+              placeholder="e.g., 850,000"
               required
             />
 
@@ -204,10 +207,12 @@ const InputField = ({
 }: {
   label: string;
   name: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   onChange: React.ChangeEventHandler;
   placeholder?: string;
   type?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }) => (
   <div>

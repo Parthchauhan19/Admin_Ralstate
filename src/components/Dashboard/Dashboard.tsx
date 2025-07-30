@@ -1,37 +1,75 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Building, Users, DollarSign, Eye, MapPin } from "lucide-react";
+import axios from "axios";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
 import PropertyChart from "./PropertyChart";
 
+interface Property {
+  _id: string;
+  propertyTitle: string;
+  price: string;
+  location: string;
+  propertyType: string;
+  bedroom: number;
+  bathroom: number;
+  area: string;
+  status: string;
+  agent: string;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const Dashboard: React.FC = () => {
+  const [properties, setProperties] = useState<Property[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/property/getAll");
+        setProperties(res.data);
+      } catch (err) {
+        console.error("Failed to fetch properties:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Calculate stats
+  const totalProperties = properties.length;
+  const forSale = properties.filter((p) => p.status === "For Sale").length;
+  const forRent = properties.filter((p) => p.status === "For Rent").length;
+  const sold = properties.filter((p) => p.status === "Sold").length;
+
   const stats = [
     {
       title: "Total Properties",
-      value: "1,234",
+      value: totalProperties.toString(),
       change: "+12%",
       changeType: "positive" as const,
       icon: Building,
       color: "blue",
     },
     {
-      title: "Active Users",
-      value: "556",
+      title: "Properties For Sale / Rent",
+      value: forSale.toString() + " / " + forRent.toString(),
       change: "+8%",
       changeType: "positive" as const,
-      icon: Users,
+      icon: DollarSign,
       color: "green",
     },
     {
-      title: "Revenue",
-      value: "$2,40,00,000",
+      title: "Sold Properties",
+      value: sold.toString(),
       change: "+38%",
       changeType: "positive" as const,
       icon: DollarSign,
       color: "yellow",
     },
     {
-      title: "Visites",
+      title: "Total Visits",
       value: "1,791",
       change: "-3%",
       changeType: "negative" as const,
@@ -40,64 +78,12 @@ const Dashboard: React.FC = () => {
     },
   ];
 
-  const recentProperties = [
-    {
-      id: 1,
-      title: "Modern Villa in Downtown",
-      price: "$850,000",
-      location: "Surat, Gujarat",
-      bedrooms: 4,
-      bathrooms: 3,
-      area: "2,500 sq ft",
-      status: "For Sale",
-      image:
-        "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=300",
-      agent: "Parth Chauhan",
-      type: "Villa",
-    },
-    {
-      id: 2,
-      title: "Luxury Apartment",
-      price: "$1,200,000",
-      location: "Rajkot, Gujarat",
-      bedrooms: 3,
-      bathrooms: 2,
-      area: "1,800 sq ft",
-      status: "Sold",
-      image:
-        "https://images.pexels.com/photos/1396122/pexels-photo-1396122.jpeg?auto=compress&cs=tinysrgb&w=300",
-      agent: "Sarah Johnson",
-      type: "Apartment",
-    },
-    {
-      id: 3,
-      title: "Cozy Family Home",
-      price: "$650,000",
-      location: "Ahemdabad, Gujarat",
-      bedrooms: 5,
-      bathrooms: 4,
-      area: "3,200 sq ft",
-      status: "For Rent",
-      image:
-        "https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=300",
-      agent: "Mike Davis",
-      type: "House",
-    },
-    {
-      id: 4,
-      title: "Thakkar Family Home",
-      price: "$450,000",
-      location: "Jesalmer, Rajsathan",
-      bedrooms: 2,
-      bathrooms: 3,
-      area: "2,200 sq ft",
-      status: "For Rent",
-      image:
-        "https://images.pexels.com/photos/1396132/pexels-photo-1396132.jpeg?auto=compress&cs=tinysrgb&w=300",
-      agent: "Vinita Thakkar",
-      type: "House",
-    },
-  ];
+  const latestProperties = [...properties]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    )
+    .slice(0, 5);
 
   return (
     <div className="p-6 space-y-6">
@@ -115,19 +101,21 @@ const Dashboard: React.FC = () => {
         ))}
       </div>
 
+      {/* Chart & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="lg:col-span-2">
           <PropertyChart />
         </div>
         <div>
-          <RecentActivity />
+          <RecentActivity activities={latestProperties} />
         </div>
       </div>
 
+      {/* Recent Properties */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">
-            Recent UpDates On Properties
+            Recent Updates On Properties
           </h2>
           <button className="text-red-600 hover:text-red-700 text-sm font-medium">
             View All
@@ -135,22 +123,22 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {recentProperties.map((property) => (
+          {latestProperties.map((property) => (
             <div
-              key={property.id}
+              key={property._id}
               className="bg-gray-50 rounded-lg p-4 hover:shadow-lg transition-shadow"
             >
               <img
                 src={property.image}
-                alt={property.title}
+                alt={property.propertyTitle}
                 className="w-full h-48 object-cover rounded-lg mb-4"
               />
               <div className="space-y-2">
                 <h3 className="font-semibold text-gray-900">
-                  {property.title}
+                  {property.propertyTitle}
                 </h3>
                 <p className="text-2xl font-bold text-green-600">
-                  {property.price}
+                  ₹{property.price}
                 </p>
                 <div className="flex items-center gap-1 text-gray-600">
                   <MapPin className="w-4 h-4" />

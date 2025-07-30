@@ -10,6 +10,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const navigate = useNavigate();
 
@@ -35,11 +36,11 @@ const Login: React.FC = () => {
       }
 
       alert(message || "Login successful!");
+      setRedirecting(true); // Show full-screen loader
 
       setTimeout(() => {
         navigate("/");
-      }, 1000);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }, 1500);
     } catch (err: any) {
       console.error("Login failed:", err);
       setError(
@@ -49,7 +50,37 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
+  const FullScreenLoader = () => (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center">
+      <svg
+        className="animate-spin h-10 w-10 text-red-600 mb-4"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        />
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+        />
+      </svg>
+      <p className="text-lg text-gray-700">Redirecting to dashboard...</p>
+    </div>
+  );
+
+  if (redirecting) {
+    return <FullScreenLoader />;
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-indigo-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">

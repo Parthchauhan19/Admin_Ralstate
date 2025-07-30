@@ -90,7 +90,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
 
         {/* Right section */}
         <div className="flex items-center gap-4">
-          <button className="relative p-2 hover:bg-gray-200 rounded-lg transition-colors">
+          <button
+            onClick={() => (window.location.href = "/Messages")}
+            className="relative p-2 hover:bg-gray-200 rounded-lg transition-colors"
+          >
             <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-zoom-pulse"></span>
           </button>
@@ -119,10 +122,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   <User className="w-4 h-4" />
                   Profile
                 </button>
-                <button
-                  
-                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                >
+                <button className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                   <LogOut className="w-4 h-4" />
                   Logout
                 </button>
