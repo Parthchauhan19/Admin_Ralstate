@@ -1,6 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useRef, useEffect } from "react";
-import { Search, Plus, MoreHorizontal, X, Edit, Trash2 } from "lucide-react";
+import {
+  Search,
+  Plus,
+  MoreHorizontal,
+  Loader,
+  X,
+  Edit,
+  Trash2,
+} from "lucide-react";
 
 interface PushNotification {
   _id?: string;
@@ -70,8 +78,7 @@ const PushNotificationManager: React.FC = () => {
 
   const itemsPerPage = 10;
 
- 
-  const API_BASE_URL = "http://localhost:8000/messages"; 
+  const API_BASE_URL = "http://localhost:8000/messages";
 
   useEffect(() => {
     fetchNotifications();
@@ -105,7 +112,6 @@ const PushNotificationManager: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        
         const transformedData = result.data.map((item: any) => ({
           ...item,
           id: item.id || item._id,
@@ -216,7 +222,7 @@ const PushNotificationManager: React.FC = () => {
       const result = await response.json();
 
       if (result.success) {
-        await fetchNotifications(); 
+        await fetchNotifications();
         alert(
           editingNotification
             ? "Notification updated successfully!"
@@ -268,7 +274,7 @@ const PushNotificationManager: React.FC = () => {
         const result = await response.json();
 
         if (result.success) {
-          await fetchNotifications(); 
+          await fetchNotifications();
           alert("Notification deleted successfully!");
         } else {
           alert(`Error deleting notification: ${result.message}`);
@@ -345,13 +351,6 @@ const PushNotificationManager: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          {loading && (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
-              <span className="ml-2">Loading...</span>
-            </div>
-          )}
-
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -471,6 +470,15 @@ const PushNotificationManager: React.FC = () => {
                 )}
               </tbody>
             </table>
+
+            {loading && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex items-center justify-center min-h-96">
+                <div className="flex items-center space-x-2">
+                  <Loader className="animate-spin" size={20} />
+                  <span>Loading data....</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
