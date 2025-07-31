@@ -128,6 +128,7 @@ const Demorampe: React.FC = () => {
 
       await fetchTeamMembers();
       handleCancelForm();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Failed to save member", error);
       alert(error.message || "Failed to save member");
