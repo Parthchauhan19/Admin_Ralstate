@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import Demorampe from "./Demorampe";
+import React, { useState, useEffect } from "react";
 
 import {
   TrendingUp,
@@ -18,103 +17,65 @@ const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30days");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
+  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample data - in real app, this would come from API when you call the API in beackend
-  const dashboardData = {
-    totalSales: 156,
-    totalRevenue: 4500650,
-    commission: 40565,
-    pendingPayments: 53,
-    completedPayments: 133,
-    failedPayments: 38,
+  const API_BASE_URL = "http://localhost:8000/transactions";
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_BASE_URL}/getAll`);
+        if (response.ok) {
+          const data = await response.json();
+          setRecentTransactions(data);
+        } else {
+          setRecentTransactions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+
+        setRecentTransactions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, []);
+
+  const calculateDashboardData = () => {
+    const completedTransactions = recentTransactions.filter(
+      (t) => t.status === "Completed"
+    );
+    const pendingTransactions = recentTransactions.filter(
+      (t) => t.status === "Pending"
+    );
+    const failedTransactions = recentTransactions.filter(
+      (t) => t.status === "Failed"
+    );
+
+    const totalRevenue = completedTransactions.reduce(
+      (sum, t) => sum + (t.amount || 0),
+      0
+    );
+    const totalCommission = completedTransactions.reduce(
+      (sum, t) => sum + (t.commission || 0),
+      0
+    );
+
+    return {
+      totalSales: recentTransactions.length,
+      totalRevenue: totalRevenue,
+      commission: totalCommission,
+      pendingPayments: pendingTransactions.length,
+      completedPayments: completedTransactions.length,
+      failedPayments: failedTransactions.length,
+    };
   };
 
-  const recentTransactions = [
-    {
-      id: "TXN-001",
-      propertyId: "PR-2025-001",
-      propertyTitle: "4 BHK Bungalow in Prahladnagar, Ahmedabad",
-      type: "Sale",
-      amount: 18000000,
-      commission: 180000,
-      status: "Completed",
-      paymentMethod: "NEFT",
-      date: "2025-07-15",
-      buyer: "Rajesh Patel",
-    },
-    {
-      id: "TXN-002",
-      propertyId: "PR-2025-002",
-      propertyTitle: "2 BHK Flat in Gotri, Vadodara",
-      type: "Rent",
-      amount: 22000,
-      commission: 2200,
-      status: "Pending",
-      paymentMethod: "Cash",
-      date: "2025-07-14",
-      buyer: "Bhavna Joshi",
-    },
-    {
-      id: "TXN-003",
-      propertyId: "PR-2025-003",
-      propertyTitle: "1 RK Apartment in Manjalpur, Vadodara",
-      type: "Rent",
-      amount: 9000,
-      commission: 900,
-      status: "Failed",
-      paymentMethod: "Google Pay",
-      date: "2025-07-13",
-      buyer: "Hardik Mehta",
-    },
-    {
-      id: "TXN-004",
-      propertyId: "PR-2025-004",
-      propertyTitle: "Commercial Office in Ring Road, Surat",
-      type: "Sale",
-      amount: 37000000,
-      commission: 370000,
-      status: "Completed",
-      paymentMethod: "RTGS",
-      date: "2025-07-12",
-      buyer: "Shree Infratech Pvt. Ltd.",
-    },
-    {
-      id: "TXN-005",
-      propertyId: "PR-2025-005",
-      propertyTitle: "Independent House in Bhavnagar",
-      type: "Rent",
-      amount: 18000,
-      commission: 1800,
-      status: "Completed",
-      paymentMethod: "Debit Card",
-      date: "2025-07-11",
-      buyer: "Falguni Desai",
-    },
-    {
-      id: "TXN-006",
-      propertyId: "PR-2025-006",
-      propertyTitle: "Luxures Villa In ScienceCity Road, Ahemdabad",
-      type: "Rent",
-      amount: 180000,
-      commission: 18000,
-      status: "Pending",
-      paymentMethod: "Cash",
-      date: "2025-07-13",
-      buyer: "Jeet Pandya",
-    },
-    {
-      id: "TXN-007",
-      propertyId: "PR-2025-007",
-      propertyTitle: "Corner Plot In Shindhubhavan, Ahemdabad",
-      type: "Buy",
-      amount: 180000000,
-      commission: 1800000,
-      status: "Failed",
-      paymentMethod: "Loan",
-      date: "2025-07-23",
-      buyer: "Harsh Makvana",
-    },
-  ];
+  const dashboardData = calculateDashboardData();
 
   const paymentMethodStats = [
     { method: "Credit Card", count: 65, percentage: 41.7 },
@@ -154,6 +115,14 @@ const Reports = () => {
       ? "bg-blue-100 text-blue-800"
       : "bg-purple-100 text-purple-800";
   };
+
+  if (loading) {
+    return (
+      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
+        <div className="text-lg text-gray-600">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -430,11 +399,14 @@ const Reports = () => {
 
             <tbody className="bg-white divide-y divide-gray-200">
               {recentTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-100">
+                <tr
+                  key={transaction.transactionId || transaction.id}
+                  className="hover:bg-gray-100"
+                >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
                       <div className="text-sm font-medium text-gray-900">
-                        {transaction.id}
+                        {transaction.transactionId || transaction.id}
                       </div>
                       <div className="text-sm text-gray-500">
                         {transaction.buyer}
@@ -505,7 +477,6 @@ const Reports = () => {
           </div>
         </div>
       </div>
-      <Demorampe />
     </div>
   );
 };
