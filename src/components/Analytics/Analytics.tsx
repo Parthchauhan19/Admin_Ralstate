@@ -380,7 +380,7 @@ const Analytics = () => {
         </h2>
         <button
           onClick={() => setShowBarModal(true)}
-          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 mb-6 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
         >
           <Plus size={16} />
           <span>Add Data</span>
@@ -414,7 +414,7 @@ const Analytics = () => {
         </h2>
         <button
           onClick={() => setShowPieModal(true)}
-          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
+          className="bg-red-500 hover:bg-red-600 text-sm text-white px-4 mb-6 py-2 rounded-lg flex items-center justify-center space-x-2 transition-colors"
         >
           <Plus size={16} />
           <span>Add Data</span>

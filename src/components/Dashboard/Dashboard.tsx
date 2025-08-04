@@ -50,7 +50,7 @@ const Dashboard: React.FC = () => {
       change: "+12%",
       changeType: "positive" as const,
       icon: Building,
-      color: "blue",
+      color: "red",
     },
     {
       title: "Properties For Sale / Rent",

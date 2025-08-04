@@ -292,16 +292,16 @@ const Users: React.FC = () => {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-col sm:flex-row">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Users</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
           <p className="text-gray-600">
             Manage system users and their permissions
           </p>
         </div>
         <button
           onClick={() => setShowAddForm(true)}
-          className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          className="flex mt-2 items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors sm:mt-0 sm:w-auto"
         >
           <Plus className="w-5 h-5" />
           Add User

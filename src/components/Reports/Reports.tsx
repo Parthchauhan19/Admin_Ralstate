@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import Demorampe from "./Demorampe";
 import {
   TrendingUp,
   DollarSign,
@@ -9,12 +10,14 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Loader,
   Plus,
   Edit,
   Trash2,
   X,
 } from "lucide-react";
-import { API_URL } from "../Server/Server";
+
+const API_URL = "http://localhost:8000/";
 
 const Reports = () => {
   const [selectedPeriod, setSelectedPeriod] = useState("30days");
@@ -33,7 +36,7 @@ const Reports = () => {
     amount: "",
     commission: "",
     status: "Completed",
-    paymentMethod: "Google Pay",
+    paymentMethod: "Cash",
     date: new Date().toISOString().split("T")[0],
   });
 
@@ -49,6 +52,7 @@ const Reports = () => {
         const data = await response.json();
         setRecentTransactions(data);
       } else {
+        console.error("Failed to fetch transactions:", response.statusText);
         setRecentTransactions([]);
       }
     } catch (error) {
@@ -61,45 +65,49 @@ const Reports = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+  };
+
+  const generateTransactionId = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, "0");
+    return `TXID-${timestamp}-${random}`;
   };
 
   const handleAddTransactions = async (e) => {
     e.preventDefault();
     try {
+      const transactionData = {
+        ...formData,
+        transactionId: generateTransactionId(),
+        amount: Number(formData.amount),
+        commission: Number(formData.commission),
+      };
+
       const response = await fetch(`${API_URL}transactions/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          amount: Number(formData.amount),
-          commission: Number(formData.commission),
-        }),
+        body: JSON.stringify(transactionData),
       });
 
       if (response.ok) {
         await fetchTransactions();
         setShowAddModal(false);
-        setFormData({
-          buyer: "",
-          propertyTitle: "",
-          propertyId: "",
-          type: "Sale",
-          amount: "",
-          commission: "",
-          status: "Completed",
-          paymentMethod: "Google Pay",
-          date: new Date().toISOString().split("T")[0],
-        });
+        resetForm();
+        alert("Transaction added successfully!");
       } else {
-        const errorText = await response.text();
-        console.error("Failed to add transaction:", errorText);
-        alert(`Failed to add transaction: ${errorText}`);
+        const errorData = await response.json();
+        console.error("Failed to add transaction:", errorData);
+        alert(
+          `Failed to add transaction: ${errorData.message || "Unknown error"}`
+        );
       }
     } catch (error) {
       console.error("Error adding transaction:", error);
@@ -110,24 +118,25 @@ const Reports = () => {
   const handleEditTransactions = async (e) => {
     e.preventDefault();
     try {
-      const transactionId =
-        currentTransaction.id || currentTransaction.transactionId;
-      if (!transactionId) {
-        console.error("Transaction ID is undefined");
+      if (!currentTransaction || !currentTransaction.transactionId) {
+        console.error("No transaction selected for editing");
         return;
       }
+
+      const updateData = {
+        ...formData,
+        amount: Number(formData.amount),
+        commission: Number(formData.commission),
+      };
+
       const response = await fetch(
-        `${API_URL}transactions/update/${transactionId}`,
+        `${API_URL}transactions/update/${currentTransaction.transactionId}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            ...formData,
-            amount: Number(formData.amount),
-            commission: Number(formData.commission),
-          }),
+          body: JSON.stringify(updateData),
         }
       );
 
@@ -135,39 +144,70 @@ const Reports = () => {
         await fetchTransactions();
         setShowEditModal(false);
         setCurrentTransaction(null);
+        resetForm();
+        alert("Transaction updated successfully!");
       } else {
-        console.error("Failed to update transaction:", await response.text());
+        const errorData = await response.json();
+        console.error("Failed to update transaction:", errorData);
+        alert(
+          `Failed to update transaction: ${
+            errorData.message || "Unknown error"
+          }`
+        );
       }
     } catch (error) {
       console.error("Error updating transaction:", error);
+      alert(`Error updating transaction: ${error.message}`);
     }
   };
 
-  const handleDeleteTransactions = async (id) => {
+  const handleDeleteTransactions = async (transactionId) => {
     if (window.confirm("Are you sure you want to delete this transaction?")) {
       try {
-        const response = await fetch(`${API_URL}/delete/${id}`, {
-          method: "DELETE",
-        });
+        const response = await fetch(
+          `${API_URL}transactions/delete/${transactionId}`,
+          {
+            method: "DELETE",
+          }
+        );
 
         if (response.ok) {
           await fetchTransactions();
+          alert("Transaction deleted successfully!");
         } else {
-          console.error("Failed to delete transaction:", await response.text());
+          const errorData = await response.json();
+          console.error("Failed to delete transaction:", errorData);
+          alert(
+            `Failed to delete transaction: ${
+              errorData.message || "Unknown error"
+            }`
+          );
         }
       } catch (error) {
         console.error("Error deleting transaction:", error);
+        alert(`Error deleting transaction: ${error.message}`);
       }
     }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      buyer: "",
+      propertyTitle: "",
+      propertyId: "",
+      type: "Sale",
+      amount: "",
+      commission: "",
+      status: "Completed",
+      paymentMethod: "Cash",
+      date: new Date().toISOString().split("T")[0],
+    });
   };
 
   const openEditModal = (transaction) => {
     if (!transaction) return;
 
-    setCurrentTransaction({
-      ...transaction,
-      id: transaction.id || transaction.transactionId,
-    });
+    setCurrentTransaction(transaction);
     setFormData({
       buyer: transaction.buyer || "",
       propertyTitle: transaction.propertyTitle || "",
@@ -176,13 +216,15 @@ const Reports = () => {
       amount: transaction.amount?.toString() || "",
       commission: transaction.commission?.toString() || "",
       status: transaction.status || "Completed",
-      paymentMethod: transaction.paymentMethod || "Google Pay",
+      paymentMethod: transaction.paymentMethod || "Cash",
       date: transaction.date
         ? new Date(transaction.date).toISOString().split("T")[0]
         : new Date().toISOString().split("T")[0],
     });
+
     setShowEditModal(true);
   };
+
   const calculateDashboardData = () => {
     const completedTransactions = recentTransactions.filter(
       (t) => t.status === "Completed"
@@ -216,9 +258,11 @@ const Reports = () => {
   const dashboardData = calculateDashboardData();
 
   const paymentMethodStats = [
-    { method: "Bank Transfer", count: 45, percentage: 28.8 },
-    { method: "Digital Wallet", count: 28, percentage: 17.9 },
-    { method: "Cash Payment", count: 18, percentage: 11.5 },
+    { method: "Cash", count: 35, percentage: 35 },
+    { method: "UPI", count: 25, percentage: 25 },
+    { method: "Bank Transfer", count: 20, percentage: 20 },
+    { method: "Google Pay", count: 15, percentage: 15 },
+    { method: "PhonePe", count: 5, percentage: 5 },
   ];
 
   const getStatusIcon = (status) => {
@@ -248,369 +292,406 @@ const Reports = () => {
   };
 
   const getTypeColor = (type) => {
-    return type === "Sale"
-      ? "bg-blue-100 text-blue-800"
-      : "bg-purple-100 text-purple-800";
+    switch (type) {
+      case "Sale":
+        return "bg-blue-100 text-blue-800";
+      case "Rent":
+        return "bg-purple-100 text-purple-800";
+      case "Buy":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
   };
+
+  const handleCloseModal = (isEdit = false) => {
+    if (isEdit) {
+      setShowEditModal(false);
+      setCurrentTransaction(null);
+    } else {
+      setShowAddModal(false);
+    }
+    resetForm();
+  };
+
+  const AddTransactionModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={() => handleCloseModal(false)}
+          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <h2 className="text-xl font-bold mb-6">Add New Transaction</h2>
+        <form onSubmit={handleAddTransactions} className="space-y-4">
+          <div>
+            <label className=" text-sm font-medium text-gray-700 mb-2">
+              Buyer Name *
+            </label>
+            <input
+              type="text"
+              name="buyer"
+              value={formData.buyer}
+              onChange={handleInputChange}
+              placeholder="Enter buyer name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Property Title *
+              </label>
+              <input
+                type="text"
+                name="propertyTitle"
+                value={formData.propertyTitle}
+                onChange={handleInputChange}
+                placeholder="Enter property title"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Property ID *
+              </label>
+              <input
+                type="text"
+                name="propertyId"
+                value={formData.propertyId}
+                onChange={handleInputChange}
+                placeholder="Enter property ID"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Transaction Type *
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select type</option>
+                <option value="Sale">Sale</option>
+                <option value="Rent">Rent</option>
+                <option value="Buy">Buy</option>
+              </select>
+            </div>
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Status *
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              >
+                <option value="">Select status</option>
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Amount ($) *
+              </label>
+              <input
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleInputChange}
+                placeholder="0.00"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                min="0"
+                step="1"
+                required
+              />
+            </div>
+            <div>
+              <label className=" text-sm font-medium text-gray-700 mb-2">
+                Commission ($) *
+              </label>
+              <input
+                type="number"
+                name="commission"
+                value={formData.commission}
+                onChange={handleInputChange}
+                placeholder="0.00"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                min="0"
+                step="1"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className=" text-sm font-medium text-gray-700 mb-2">
+              Payment Method *
+            </label>
+            <select
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            >
+              <option value="">Select payment method</option>
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Google Pay">Google Pay</option>
+              <option value="PhonePe">PhonePe</option>
+            </select>
+          </div>
+
+          <div>
+            <label className=" text-sm font-medium text-gray-700 mb-2">
+              Transaction Date *
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => handleCloseModal(false)}
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Add Transaction
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+
+  const EditTransactionModal = () => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
+        <button
+          onClick={() => handleCloseModal(true)}
+          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
+        >
+          <X className="w-5 h-5" />
+        </button>
+        <h2 className="text-xl font-bold mb-6">Edit Transaction</h2>
+        <form onSubmit={handleEditTransactions} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Buyer Name *
+            </label>
+            <input
+              type="text"
+              name="buyer"
+              value={formData.buyer}
+              onChange={handleInputChange}
+              placeholder="Enter buyer name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Property Title *
+              </label>
+              <input
+                type="text"
+                name="propertyTitle"
+                value={formData.propertyTitle}
+                onChange={handleInputChange}
+                placeholder="Enter property title"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Property ID *
+              </label>
+              <input
+                type="text"
+                name="propertyId"
+                value={formData.propertyId}
+                onChange={handleInputChange}
+                placeholder="Enter property ID"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Transaction Type *
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              >
+                <option value="Sale">Sale</option>
+                <option value="Rent">Rent</option>
+                <option value="Buy">Buy</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Status *
+              </label>
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                required
+              >
+                <option value="Completed">Completed</option>
+                <option value="Pending">Pending</option>
+                <option value="Failed">Failed</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Amount ($) *
+              </label>
+              <input
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleInputChange}
+                placeholder="0.00"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                min="0"
+                step="1"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Commission ($) *
+              </label>
+              <input
+                type="number"
+                name="commission"
+                value={formData.commission}
+                onChange={handleInputChange}
+                placeholder="0.00"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                min="0"
+                step="1"
+                required
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Payment Method *
+            </label>
+            <select
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            >
+              <option value="Cash">Cash</option>
+              <option value="UPI">UPI</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="Google Pay">Google Pay</option>
+              <option value="PhonePe">PhonePe</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Transaction Date *
+            </label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              required
+            />
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => handleCloseModal(true)}
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Update Transaction
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
-      <div className="p-6 bg-gray-50 min-h-screen flex items-center justify-center">
-        <div className="text-lg text-gray-600">Loading...</div>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 flex items-center justify-center min-h-96">
+        <div className="flex items-center space-x-2">
+          <Loader className="animate-spin" size={20} />
+          <span>Loading analytics data...</span>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Add Transaction Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => setShowAddModal(false)}
-              className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Add New Transaction</h2>
-            <form onSubmit={handleAddTransactions}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Buyer Name
-                </label>
-                <input
-                  type="text"
-                  name="buyer"
-                  value={formData.buyer}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property Title
-                  </label>
-                  <input
-                    type="text"
-                    name="propertyTitle"
-                    value={formData.propertyTitle}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property ID
-                  </label>
-                  <input
-                    type="text"
-                    name="propertyId"
-                    value={formData.propertyId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Type
-                  </label>
-                  <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="Sale">Sale</option>
-                    <option value="Rent">Rent</option>
-                    <option value="Buy">Buy</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="Completed">Completed</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Failed">Failed</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Amount ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Commission ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="commission"
-                    value={formData.commission}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Method
-                </label>
-                <select
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                >
-                  <option value="Cash">Cash</option>
-                  <option value="Google Pay">Google Pay</option>
-                  <option value="Debit Card">Debit Card</option>
-                  <option value="NEFT">NEFT</option>
-                  <option value="RTGS">RTGS</option>
-                  <option value="LOAN">LOAN</option>
-                  <option value="Cash">Cash</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Add Transaction
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Transaction Modal */}
-      {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={() => setShowEditModal(false)}
-              className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-5 h-5" />
-            </button>
-            <h2 className="text-xl font-bold mb-4">Edit Transaction</h2>
-            <form onSubmit={handleEditTransactions}>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Buyer Name
-                </label>
-                <input
-                  type="text"
-                  name="buyer"
-                  value={formData.buyer}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property Title
-                  </label>
-                  <input
-                    type="text"
-                    name="propertyTitle"
-                    value={formData.propertyTitle}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Property ID
-                  </label>
-                  <input
-                    type="text"
-                    name="propertyId"
-                    value={formData.propertyId}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Type
-                  </label>
-                  <select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="Sale">Sale</option>
-                    <option value="Rent">Rent</option>
-                    <option value="Buy">Buy</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  >
-                    <option value="Completed">Completed</option>
-                    <option value="Pending">Pending</option>
-                    <option value="Failed">Failed</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Amount ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Commission ($)
-                  </label>
-                  <input
-                    type="number"
-                    name="commission"
-                    value={formData.commission}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    min="0"
-                    step="0.01"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Payment Method
-                </label>
-                <select
-                  name="paymentMethod"
-                  value={formData.paymentMethod}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                >
-                  <option value="Cash">Cash</option>
-                  <option value="Google Pay">Google Pay</option>
-                  <option value="Debit Card">Debit Card</option>
-                  <option value="NEFT">NEFT</option>
-                  <option value="RTGS">RTGS</option>
-                  <option value="LOAN">LOAN</option>
-                </select>
-              </div>
-
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Update Transaction
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {showAddModal && <AddTransactionModal />}
+      {showEditModal && <EditTransactionModal />}
 
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -638,6 +719,7 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-500" />
@@ -669,9 +751,10 @@ const Reports = () => {
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Methods</option>
+              <option value="cash">Cash</option>
+              <option value="upi">UPI</option>
               <option value="bank">Bank Transfer</option>
               <option value="digital">Digital Wallet</option>
-              <option value="cash">Cash Payment</option>
             </select>
           </div>
           <div>
@@ -692,6 +775,7 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Dashboard Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
           <div className="flex items-center justify-between">
@@ -764,6 +848,7 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -782,11 +867,20 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-500 h-2 rounded-full"
-                    style={{ width: "69%" }}
+                    style={{
+                      width: `${
+                        recentTransactions.length > 0
+                          ? (dashboardData.completedPayments /
+                              recentTransactions.length) *
+                            100
+                          : 0
+                      }%`,
+                    }}
                   ></div>
                 </div>
               </div>
             </div>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5 text-yellow-500" />
@@ -799,11 +893,20 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: "33%" }}
+                    style={{
+                      width: `${
+                        recentTransactions.length > 0
+                          ? (dashboardData.pendingPayments /
+                              recentTransactions.length) *
+                            100
+                          : 0
+                      }%`,
+                    }}
                   ></div>
                 </div>
               </div>
             </div>
+
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <XCircle className="w-5 h-5 text-red-500" />
@@ -816,7 +919,15 @@ const Reports = () => {
                 <div className="w-32 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-red-500 h-2 rounded-full"
-                    style={{ width: "22%" }}
+                    style={{
+                      width: `${
+                        recentTransactions.length > 0
+                          ? (dashboardData.failedPayments /
+                              recentTransactions.length) *
+                            100
+                          : 0
+                      }%`,
+                    }}
                   ></div>
                 </div>
               </div>
@@ -852,6 +963,7 @@ const Reports = () => {
         </div>
       </div>
 
+      {/* Transactions Table */}
       <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -913,13 +1025,13 @@ const Reports = () => {
               ) : (
                 recentTransactions.map((transaction) => (
                   <tr
-                    key={transaction.transactionId || transaction.id}
+                    key={transaction.transactionId || transaction._id}
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
                         <div className="text-sm font-medium text-gray-900">
-                          {transaction.transactionId || transaction.id}
+                          {transaction.transactionId}
                         </div>
                         <div className="text-sm text-gray-500">
                           {transaction.buyer}
@@ -982,7 +1094,7 @@ const Reports = () => {
                         </button>
                         <button
                           onClick={() =>
-                            handleDeleteTransactions(transaction.id)
+                            handleDeleteTransactions(transaction.transactionId)
                           }
                           className="p-1 text-red-600 hover:text-red-800 transition-colors"
                           title="Delete"
@@ -1000,7 +1112,7 @@ const Reports = () => {
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
           <div className="flex items-center justify-between">
             <div className="text-sm text-gray-700">
-              Showing 1 to {Math.min(5, recentTransactions.length)} of{" "}
+              Showing 1 to {Math.min(10, recentTransactions.length)} of{" "}
               {recentTransactions.length} transactions
             </div>
             <div className="flex items-center gap-2">
@@ -1014,6 +1126,7 @@ const Reports = () => {
           </div>
         </div>
       </div>
+      <Demorampe />
     </div>
   );
 };

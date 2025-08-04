@@ -168,14 +168,14 @@ const Properties: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6  flex-col sm:flex-row">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Properties</h1>
           <p className="text-gray-600">Manage your property listings</p>
         </div>
         <Link
           to="/properties-form"
-          className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+          className="flex mt-2 items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors sm:mt-0 sm:w-auto"
         >
           <Plus className="w-5 h-5" />
           Add Property
