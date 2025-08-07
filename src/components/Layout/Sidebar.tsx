@@ -1,7 +1,7 @@
 import React from "react";
 import {
   Home,
-  Building,
+  Building2 as Building,
   Users as UsersIcon,
   Settings,
   BarChart3,
@@ -9,6 +9,8 @@ import {
   Calendar,
   MessageSquare,
   X,
+  Phone,
+  Contact,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 // import { useAuth } from "../../contexts/AuthContext";
@@ -28,6 +30,8 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
     { id: "properties", icon: Building, label: "Properties" },
     { id: "users", icon: UsersIcon, label: "Users" },
     { id: "analytics", icon: BarChart3, label: "Analytics" },
+    { id: "services", icon: Phone, label: "Services" },
+    { id: "inquiry", icon: Contact, label: "Inquiry" },
     { id: "reports", icon: FileText, label: "Reports" },
     { id: "calendar", icon: Calendar, label: "Calendar" },
     { id: "messages", icon: MessageSquare, label: "Messages" },

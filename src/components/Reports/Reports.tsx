@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Demorampe from "./Demorampe";
 import {
   TrendingUp,
   DollarSign,
@@ -15,11 +14,15 @@ import {
   Edit,
   Trash2,
   X,
+  Info,
+  AlertTriangle,
 } from "lucide-react";
+import Demorampe from "./Demorampe";
+
 
 const API_URL = "http://localhost:8000/";
 
-const Reports = () => {
+function App() {
   const [selectedPeriod, setSelectedPeriod] = useState("30days");
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
@@ -40,9 +43,31 @@ const Reports = () => {
     date: new Date().toISOString().split("T")[0],
   });
 
+
+  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("info");
+
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState(null); 
+
   useEffect(() => {
     fetchTransactions();
   }, []);
+
+
+  const showCustomAlert = (message, type = "info") => {
+    setAlertMessage(message);
+    setAlertType(type);
+    setShowAlertModal(true);
+  };
+
+  const showCustomConfirm = (message, action) => {
+    setConfirmMessage(message);
+    setConfirmAction(() => action);
+    setShowConfirmModal(true);
+  };
 
   const fetchTransactions = async () => {
     try {
@@ -54,10 +79,15 @@ const Reports = () => {
       } else {
         console.error("Failed to fetch transactions:", response.statusText);
         setRecentTransactions([]);
+        showCustomAlert(
+          `Failed to fetch transactions: ${response.statusText}`,
+          "error"
+        );
       }
     } catch (error) {
       console.error("Error fetching transactions:", error);
       setRecentTransactions([]);
+      showCustomAlert(`Error fetching transactions: ${error.message}`, "error");
     } finally {
       setLoading(false);
     }
@@ -101,17 +131,18 @@ const Reports = () => {
         await fetchTransactions();
         setShowAddModal(false);
         resetForm();
-        alert("Transaction added successfully!");
+        showCustomAlert("Transaction added successfully!", "success");
       } else {
         const errorData = await response.json();
         console.error("Failed to add transaction:", errorData);
-        alert(
-          `Failed to add transaction: ${errorData.message || "Unknown error"}`
+        showCustomAlert(
+          `Failed to add transaction: ${errorData.message || "Unknown error"}`,
+          "error"
         );
       }
     } catch (error) {
       console.error("Error adding transaction:", error);
-      alert(`Error adding transaction: ${error.message}`);
+      showCustomAlert(`Error adding transaction: ${error.message}`, "error");
     }
   };
 
@@ -120,6 +151,7 @@ const Reports = () => {
     try {
       if (!currentTransaction || !currentTransaction.transactionId) {
         console.error("No transaction selected for editing");
+        showCustomAlert("No transaction selected for editing.", "error");
         return;
       }
 
@@ -145,49 +177,57 @@ const Reports = () => {
         setShowEditModal(false);
         setCurrentTransaction(null);
         resetForm();
-        alert("Transaction updated successfully!");
+        showCustomAlert("Transaction updated successfully!", "success");
       } else {
         const errorData = await response.json();
         console.error("Failed to update transaction:", errorData);
-        alert(
+        showCustomAlert(
           `Failed to update transaction: ${
             errorData.message || "Unknown error"
-          }`
+          }`,
+          "error"
         );
       }
     } catch (error) {
       console.error("Error updating transaction:", error);
-      alert(`Error updating transaction: ${error.message}`);
+      showCustomAlert(`Error updating transaction: ${error.message}`, "error");
     }
   };
 
   const handleDeleteTransactions = async (transactionId) => {
-    if (window.confirm("Are you sure you want to delete this transaction?")) {
-      try {
-        const response = await fetch(
-          `${API_URL}transactions/delete/${transactionId}`,
-          {
-            method: "DELETE",
-          }
-        );
+    showCustomConfirm(
+      "Are you sure you want to delete this transaction?",
+      async () => {
+        try {
+          const response = await fetch(
+            `${API_URL}transactions/delete/${transactionId}`,
+            {
+              method: "DELETE",
+            }
+          );
 
-        if (response.ok) {
-          await fetchTransactions();
-          alert("Transaction deleted successfully!");
-        } else {
-          const errorData = await response.json();
-          console.error("Failed to delete transaction:", errorData);
-          alert(
-            `Failed to delete transaction: ${
-              errorData.message || "Unknown error"
-            }`
+          if (response.ok) {
+            await fetchTransactions();
+            showCustomAlert("Transaction deleted successfully!", "success");
+          } else {
+            const errorData = await response.json();
+            console.error("Failed to delete transaction:", errorData);
+            showCustomAlert(
+              `Failed to delete transaction: ${
+                errorData.message || "Unknown error"
+              }`,
+              "error"
+            );
+          }
+        } catch (error) {
+          console.error("Error deleting transaction:", error);
+          showCustomAlert(
+            `Error deleting transaction: ${error.message}`,
+            "error"
           );
         }
-      } catch (error) {
-        console.error("Error deleting transaction:", error);
-        alert(`Error deleting transaction: ${error.message}`);
       }
-    }
+    );
   };
 
   const resetForm = () => {
@@ -257,6 +297,7 @@ const Reports = () => {
 
   const dashboardData = calculateDashboardData();
 
+  // This data is static in your original code, so keeping it as is.
   const paymentMethodStats = [
     { method: "Cash", count: 35, percentage: 35 },
     { method: "UPI", count: 25, percentage: 25 },
@@ -314,23 +355,103 @@ const Reports = () => {
     resetForm();
   };
 
+  const CustomAlertModal = ({ message, type, onClose }) => {
+    let icon;
+    let bgColor;
+    let textColor;
+    switch (type) {
+      case "success":
+        icon = <CheckCircle className="w-6 h-6 text-green-600" />;
+        bgColor = "bg-green-100";
+        textColor = "text-green-800";
+        break;
+      case "error":
+        icon = <XCircle className="w-6 h-6 text-red-600" />;
+        bgColor = "bg-red-100";
+        textColor = "text-red-800";
+        break;
+      case "info":
+      default:
+        icon = <Info className="w-6 h-6 text-blue-600" />;
+        bgColor = "bg-blue-100";
+        textColor = "text-blue-800";
+        break;
+    }
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm relative">
+          <div
+            className={`flex items-center gap-3 mb-4 ${bgColor} p-3 rounded-lg`}
+          >
+            {icon}
+            <span className={`font-semibold ${textColor}`}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </span>
+          </div>
+          <p className="text-gray-700 mb-6">{message}</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const CustomConfirmModal = ({ message, onConfirm, onCancel }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm relative">
+        <div className="flex items-center gap-3 mb-4 bg-yellow-100 p-3 rounded-lg">
+          <AlertTriangle className="w-6 h-6 text-yellow-600" />
+          <span className="font-semibold text-yellow-800">Confirmation</span>
+        </div>
+        <p className="text-gray-700 mb-6">{message}</p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onCancel}
+            className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Confirm
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   const AddTransactionModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={() => handleCloseModal(false)}
-          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-xl font-bold mb-6">Add New Transaction</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-900">
+          Add New Transaction
+        </h2>
         <form onSubmit={handleAddTransactions} className="space-y-4">
           <div>
-            <label className=" text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="buyer"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Buyer Name *
             </label>
             <input
               type="text"
+              id="buyer"
               name="buyer"
               value={formData.buyer}
               onChange={handleInputChange}
@@ -342,11 +463,15 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="propertyTitle"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Property Title *
               </label>
               <input
                 type="text"
+                id="propertyTitle"
                 name="propertyTitle"
                 value={formData.propertyTitle}
                 onChange={handleInputChange}
@@ -356,11 +481,15 @@ const Reports = () => {
               />
             </div>
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="propertyId"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Property ID *
               </label>
               <input
                 type="text"
+                id="propertyId"
                 name="propertyId"
                 value={formData.propertyId}
                 onChange={handleInputChange}
@@ -373,10 +502,14 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="type"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Transaction Type *
               </label>
               <select
+                id="type"
                 name="type"
                 value={formData.type}
                 onChange={handleInputChange}
@@ -390,10 +523,14 @@ const Reports = () => {
               </select>
             </div>
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="status"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Status *
               </label>
               <select
+                id="status"
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
@@ -410,11 +547,15 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="amount"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Amount ($) *
               </label>
               <input
                 type="number"
+                id="amount"
                 name="amount"
                 value={formData.amount}
                 onChange={handleInputChange}
@@ -426,11 +567,15 @@ const Reports = () => {
               />
             </div>
             <div>
-              <label className=" text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="commission"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Commission ($) *
               </label>
               <input
                 type="number"
+                id="commission"
                 name="commission"
                 value={formData.commission}
                 onChange={handleInputChange}
@@ -444,10 +589,14 @@ const Reports = () => {
           </div>
 
           <div>
-            <label className=" text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="paymentMethod"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Payment Method *
             </label>
             <select
+              id="paymentMethod"
               name="paymentMethod"
               value={formData.paymentMethod}
               onChange={handleInputChange}
@@ -464,11 +613,15 @@ const Reports = () => {
           </div>
 
           <div>
-            <label className=" text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="date"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Transaction Date *
             </label>
             <input
               type="date"
+              id="date"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
@@ -481,13 +634,13 @@ const Reports = () => {
             <button
               type="button"
               onClick={() => handleCloseModal(false)}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md"
             >
               Add Transaction
             </button>
@@ -498,22 +651,28 @@ const Reports = () => {
   );
 
   const EditTransactionModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
         <button
           onClick={() => handleCloseModal(true)}
-          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700"
+          className="absolute top-4 right-4 p-1 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-xl font-bold mb-6">Edit Transaction</h2>
+        <h2 className="text-xl font-bold mb-6 text-gray-900">
+          Edit Transaction
+        </h2>
         <form onSubmit={handleEditTransactions} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="editBuyer"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Buyer Name *
             </label>
             <input
               type="text"
+              id="editBuyer"
               name="buyer"
               value={formData.buyer}
               onChange={handleInputChange}
@@ -525,11 +684,15 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editPropertyTitle"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Property Title *
               </label>
               <input
                 type="text"
+                id="editPropertyTitle"
                 name="propertyTitle"
                 value={formData.propertyTitle}
                 onChange={handleInputChange}
@@ -539,11 +702,15 @@ const Reports = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editPropertyId"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Property ID *
               </label>
               <input
                 type="text"
+                id="editPropertyId"
                 name="propertyId"
                 value={formData.propertyId}
                 onChange={handleInputChange}
@@ -556,10 +723,14 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editType"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Transaction Type *
               </label>
               <select
+                id="editType"
                 name="type"
                 value={formData.type}
                 onChange={handleInputChange}
@@ -572,10 +743,14 @@ const Reports = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editStatus"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Status *
               </label>
               <select
+                id="editStatus"
                 name="status"
                 value={formData.status}
                 onChange={handleInputChange}
@@ -591,11 +766,15 @@ const Reports = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editAmount"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Amount ($) *
               </label>
               <input
                 type="number"
+                id="editAmount"
                 name="amount"
                 value={formData.amount}
                 onChange={handleInputChange}
@@ -607,11 +786,15 @@ const Reports = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="editCommission"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Commission ($) *
               </label>
               <input
                 type="number"
+                id="editCommission"
                 name="commission"
                 value={formData.commission}
                 onChange={handleInputChange}
@@ -625,10 +808,14 @@ const Reports = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="editPaymentMethod"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Payment Method *
             </label>
             <select
+              id="editPaymentMethod"
               name="paymentMethod"
               value={formData.paymentMethod}
               onChange={handleInputChange}
@@ -644,11 +831,15 @@ const Reports = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="editDate"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Transaction Date *
             </label>
             <input
               type="date"
+              id="editDate"
               name="date"
               value={formData.date}
               onChange={handleInputChange}
@@ -661,13 +852,13 @@ const Reports = () => {
             <button
               type="button"
               onClick={() => handleCloseModal(true)}
-              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors shadow-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md"
             >
               Update Transaction
             </button>
@@ -689,9 +880,30 @@ const Reports = () => {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-6 bg-gray-50 min-h-screen font-sans">
       {showAddModal && <AddTransactionModal />}
       {showEditModal && <EditTransactionModal />}
+      {showAlertModal && (
+        <CustomAlertModal
+          message={alertMessage}
+          type={alertType}
+          onClose={() => setShowAlertModal(false)}
+        />
+      )}
+      {showConfirmModal && (
+        <CustomConfirmModal
+          message={confirmMessage}
+          onConfirm={() => {
+            if (confirmAction) confirmAction();
+            setShowConfirmModal(false);
+            setConfirmAction(null);
+          }}
+          onCancel={() => {
+            setShowConfirmModal(false);
+            setConfirmAction(null);
+          }}
+        />
+      )}
 
       <div className="mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -706,12 +918,12 @@ const Reports = () => {
           <div className="flex flex-col sm:flex-row gap-3 mt-4 sm:mt-0">
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md"
             >
               <Plus className="w-4 h-4" />
               Add Transaction
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+            <button className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-md">
               <Download className="w-4 h-4" />
               Export Report
             </button>
@@ -720,17 +932,21 @@ const Reports = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-xl shadow-sm p-6 mb-6 border border-gray-200">
         <div className="flex items-center gap-2 mb-4">
           <Filter className="w-5 h-5 text-gray-500" />
           <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="timePeriod"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Time Period
             </label>
             <select
+              id="timePeriod"
               value={selectedPeriod}
               onChange={(e) => setSelectedPeriod(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -742,10 +958,14 @@ const Reports = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="paymentMethodFilter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Payment Method
             </label>
             <select
+              id="paymentMethodFilter"
               value={selectedPaymentMethod}
               onChange={(e) => setSelectedPaymentMethod(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -758,10 +978,14 @@ const Reports = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="paymentStatusFilter"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Payment Status
             </label>
             <select
+              id="paymentStatusFilter"
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -850,7 +1074,7 @@ const Reports = () => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Payment Status Distribution
           </h3>
@@ -935,7 +1159,7 @@ const Reports = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm p-6 hover:shadow-lg transition-shadow border border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             Payment Methods Usage
           </h3>
@@ -964,14 +1188,15 @@ const Reports = () => {
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow">
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-semibold text-gray-900">
             Recent Transactions
           </h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
+            {/* Removed whitespace between table and thead/tbody */}
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -1003,7 +1228,6 @@ const Reports = () => {
                 </th>
               </tr>
             </thead>
-
             <tbody className="bg-white divide-y divide-gray-200">
               {recentTransactions.length === 0 ? (
                 <tr>
@@ -1087,7 +1311,7 @@ const Reports = () => {
                       <div className="flex gap-2">
                         <button
                           onClick={() => openEditModal(transaction)}
-                          className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+                          className="p-1 text-blue-600 hover:text-blue-800 transition-colors rounded-full hover:bg-blue-50"
                           title="Edit"
                         >
                           <Edit className="w-4 h-4" />
@@ -1096,7 +1320,7 @@ const Reports = () => {
                           onClick={() =>
                             handleDeleteTransactions(transaction.transactionId)
                           }
-                          className="p-1 text-red-600 hover:text-red-800 transition-colors"
+                          className="p-1 text-red-600 hover:text-red-800 transition-colors rounded-full hover:bg-red-50"
                           title="Delete"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -1110,16 +1334,16 @@ const Reports = () => {
           </table>
         </div>
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="text-sm text-gray-700">
               Showing 1 to {Math.min(10, recentTransactions.length)} of{" "}
               {recentTransactions.length} transactions
             </div>
             <div className="flex items-center gap-2">
-              <button className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">
+              <button className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors shadow-sm">
                 Previous
               </button>
-              <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+              <button className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition-colors shadow-sm">
                 Next
               </button>
             </div>
@@ -1129,6 +1353,6 @@ const Reports = () => {
       <Demorampe />
     </div>
   );
-};
+}
 
-export default Reports;
+export default App;

@@ -15,6 +15,8 @@ const pages = [
   { name: "Properties", path: "/properties" },
   { name: "Users", path: "/users" },
   { name: "Analytics", path: "/analytics" },
+  { name: "Services", path: "/services" },
+  { name: "Inquiry", path: "/inquiry" },
   { name: "Reports", path: "/reports" },
   { name: "Calendar", path: "/calendar" },
   { name: "Message", path: "/Messages" },

@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { API_URL } from "../Server/Server";
 
-
 const PropertyForm: React.FC = () => {
   const [formData, setFormData] = useState({
     propertyTitle: "",

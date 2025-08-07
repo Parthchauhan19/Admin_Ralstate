@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Building, Users, DollarSign, Eye, MapPin } from "lucide-react";
+import {
+  Building2 as Building,
+  Users,
+  DollarSign,
+  Eye,
+  MapPin,
+} from "lucide-react";
 import axios from "axios";
 import StatsCard from "./StatsCard";
 import RecentActivity from "./RecentActivity";
